@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+  	android:layout_height="wrap_content"
+  	android:layout_margin="20dp"
+  	android:orientation="vertical" >
+
+    <Button
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight=".3"
+	    android:layout_margin="5dp"
+	    android:onClick="clickRunExperiment"
+	    android:text="@string/start_run_experiment"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+
+	</Button>
+    
+	<Button
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight=".3"
+	    android:layout_margin="5dp"
+	    android:onClick="clickDemoTouch"
+	    android:text="@string/start_demo_touch"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+	
+	</Button>
+	
+	<Button
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight=".3"
+	    android:layout_margin="5dp"
+	    android:onClick="clickDemoAccel"
+	    android:text="@string/start_demo_accel"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+	
+	</Button>
+	
+	<Button
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight=".3"
+	    android:layout_margin="5dp"
+	    android:onClick="clickDemoFace"
+	    android:text="@string/start_demo_face"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+
+	</Button>
+	
+	<Button
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight=".3"
+	    android:layout_margin="5dp"
+	    android:onClick="clickExit"
+	    android:text="@string/start_exit"
+	    android:textAppearance="?android:attr/textAppearanceMedium" >
+
+	</Button>
+	
+</LinearLayout>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frame"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <FrameLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:paddingBottom="80dp" >
+
+	    <fragment
+	        android:id="@+id/map"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:name="com.google.android.gms.maps.MapFragment"
+			android:layout_gravity="center" />
+	
+	    <ImageView
+	        android:id="@+id/crosshair"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:contentDescription="@string/map_crosshair"
+	        android:src="@drawable/crosshair" />
+	</FrameLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+	    android:layout_height="80dp"
+	    android:layout_gravity="bottom"
+	    android:orientation="horizontal"
+	    android:baselineAligned="false">
+    
+        <Button
+            style="?android:attr/button"
+	        android:id="@+id/mapStartBtn"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:layout_marginTop="5dp"
+	        android:onClick="clickStart"
+	        android:text="@string/map_btn_start"
+	        android:textSize="30sp" />   
+
+        <Button
+            style="?android:attr/button"
+            android:id="@+id/mapDoneBtn"
+            android:visibility="gone"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:layout_marginTop="5dp"
+	        android:onClick="clickDone"
+	        android:text="@string/map_btn_done"
+	        android:textSize="30sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mapStatus"
+        android:visibility="gone"
+        android:layout_width="fill_parent"
+	    android:layout_height="80dp"
+	    android:layout_gravity="bottom"
+	    android:orientation="horizontal"
+	    android:baselineAligned="false">
+
+        <LinearLayout
+	        android:layout_width="0dp"
+	        android:layout_height="80dp"
+	        android:layout_weight=".2"
+	        android:orientation="vertical"
+	        android:padding="10dp" >        
+            <TextView 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_lat"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView 
+                android:id="@+id/mapLat"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_lat"
+                android:textAppearance="?android:attr/textAppearanceLarge" />            
+        </LinearLayout>
+
+        <LinearLayout
+	        android:layout_width="0dp"
+	        android:layout_height="80dp"
+	        android:layout_weight=".2"
+	        android:orientation="vertical"
+	        android:padding="10dp" >        
+            <TextView 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_long"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/mapLong"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_long"
+                android:textAppearance="?android:attr/textAppearanceLarge" />            
+        </LinearLayout>
+        
+        <LinearLayout
+	        android:layout_width="0dp"
+	        android:layout_height="80dp"
+	        android:layout_weight=".2"
+	        android:orientation="vertical"
+	        android:padding="10dp" >        
+            <TextView 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_zoom"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView 
+                android:id="@+id/mapZoom"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_zoom"
+                android:textAppearance="?android:attr/textAppearanceLarge" />            
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+	        android:layout_height="80dp"
+	        android:layout_weight=".2"
+	        android:orientation="vertical"
+	        android:padding="10dp" >        
+            <TextView 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_time"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView 
+                android:id="@+id/mapTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/map_label_time"
+                android:textAppearance="?android:attr/textAppearanceLarge" />            
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
