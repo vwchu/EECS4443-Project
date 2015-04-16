@@ -1,281 +1,476 @@
 package ca.yorku.eecs.cse13261.eecs4443project;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.*;
+import java.util.*;
 import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.model.*;
 import android.app.*;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
+import android.graphics.*;
+import android.hardware.*;
+import android.media.*;
 import android.os.*;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.*;
+import android.widget.*;
+import static ca.yorku.eecs.cse13261.eecs4443project.Utils.*;
+import static ca.yorku.eecs.cse13261.eecs4443project.AppConfig.*;
 
-public class MapActivity extends Activity implements OnMapReadyCallback, OnCameraChangeListener {
+/**
+ * Map Activity
+ *
+ * @author Vincent Chu
+ * @version 1.0
+ */
+public class MapActivity extends Activity {
 
-    static final int TOUCH_INPUT = 0;
-    static final int ACCELERATOR_INPUT = 1;
-    static final int FACE_INPUT = 2;
+    static final int INTERVAL = 50; // milliseconds
 
-    TextView mapLat;
-    TextView mapLong;
-    TextView mapZoom;
-    TextView mapTime;
-    LinearLayout mapStatus;
-    Button mapDoneBtn;
+    AppConfig config;
+    MapActivityUI ui;
+    DataLogger logger;
+    //AccelerometerMode accelMode;
+    Scheduler timer;
+    Bundle bundle;
+    Map mMap;
 
     boolean demo;
-    boolean stopped = false;
-    String participantCode;
-    String groupCode;
-    int    trials;
-    LatLng startLocation;
-    float  startZoom;
+    int     mode;
+    String  participantCode;
+    String  groupCode;
+    String  sessionCode;
+    int     trials;
+    int[]   order;
+    int     runID;
+    String  dataDirectory;
+    String  dataFile;
+    long    initTime;
+    boolean startExperiment;
 
-    Timer timer;
-    PrintWriter dataWriter;
-    String[] order;
-    int trialNumber;
-    String mode;
-
-    GoogleMap googleMap;
-    LatLng target;
-    double zoom;
-    Marker marker;
-    long time = 0;
-
-    AcceleratorMode acceleratorMode = new AcceleratorMode();
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
-        fullscreen();
-        uiElement();
-        initParams();
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
+        config = getConfig(getResources());
+        bundle = getIntent().getExtras();
 
-    void fullscreen() {
-        if (Build.VERSION.SDK_INT < 16) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-        getActionBar().hide();
-    }
+        loadBundle();
 
-    void initParams() {
-        Bundle b = getIntent().getExtras();
-        Resources res = getResources();
-        
-        demo = b.getBoolean("demo");
-        mode = b.getString("mode");
-        
+        mMap   = new Map();
+        ui     = new MapActivityUI();
+        timer  = new Scheduler(INTERVAL, INTERVAL);
+
         if (!demo) {
-            participantCode = b.getString("participantCode");
-            groupCode = b.getString("groupCode");
-            trials = b.getInt("trials");
-            order = b.getStringArray("ordering");
-            trialNumber = b.getInt("trialNumber");
-   
-            try {
-                dataWriter = new PrintWriter(new File(b.getString("dataDirectory"), b.getString("dataFile")));
-            } catch (Exception e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), StartActivity.class));
-                finish();
+            logger = new DataLogger();
+            if (runID == 0) {
+                logger.writeHeader();
             }
         }
-
-        startZoom = Float.parseFloat(res.getString(R.string.configDefaultZoom));
-        zoom = Float.parseFloat(res.getString(R.string.configTargetZoom));
-        startLocation = new LatLng(
-            Double.parseDouble(res.getString(R.string.configDefaultLatitude)),
-            Double.parseDouble(res.getString(R.string.configDefaultLongitude)));
-
-        if ("ACCEL".equals(mode)) {
-            acceleratorMode.enableAcceleratorMode();
+        if (mode == config.ACCELEROMETER_INPUT) {
+            //accelMode = new AccelerometerMode();
+        } else if (mode == config.FACE_INPUT) {
+            // TODO
         }
-
     }
 
-    void uiElement() {
-        mapLat     = (TextView)findViewById(R.id.mapLat);
-        mapLong    = (TextView)findViewById(R.id.mapLong);
-        mapZoom    = (TextView)findViewById(R.id.mapZoom);
-        mapTime    = (TextView)findViewById(R.id.mapTime);
-        mapStatus  = (LinearLayout)findViewById(R.id.mapStatus);
-        mapDoneBtn = (Button)findViewById(R.id.mapDoneBtn);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mode == config.ACCELEROMETER_INPUT) {
+            //accelMode.unregister();
+        } else if (mode == config.FACE_INPUT) {
+            // TODO
+        }
     }
+
+    /// CLICK CALLBACKS
 
     public void clickStart(View view) {
-        if (googleMap != null && time == 0) {
-            LatLngBounds bounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
-            LatLng northeast = bounds.northeast;
-            LatLng southwest = bounds.southwest;
-    
-            double latDelta = southwest.latitude  - northeast.latitude;
-            double lngDelta = southwest.longitude - northeast.longitude;
-            double lat = northeast.latitude  + latDelta * 0.2 + Math.random() * latDelta * 0.6;
-            double lng = northeast.longitude + lngDelta * 0.2 + Math.random() * lngDelta * 0.6;
-    
-            target = new LatLng(lat, lng);
-            marker = googleMap.addMarker(new MarkerOptions().position(target));
-            time = System.currentTimeMillis();
+        if (mMap.isMapReady()) {
+            initTime = System.currentTimeMillis();
+            ui.onStart();
 
-            onCameraChange(googleMap.getCameraPosition());
-            view.setVisibility(View.GONE);
-            mapStatus.setVisibility(View.VISIBLE);
-            
-            // TODO
+            if (mode == config.TOUCH_INPUT) {
+                startExperiment = true;
+                mMap.addTarget();
+                ringTone();
+            } else if (mode == config.ACCELEROMETER_INPUT) {
+                //accelMode.register();
+            } else if (mode == config.FACE_INPUT) {
+                // TODO
+            }
+            timer.run();
         }
     }
 
     public void clickDone(View view) {
         if (demo) {
-            Intent i = new Intent(getApplicationContext(), StartActivity.class);
-            startActivity(i);
-            finish();
-        } else {
+            goToActivity(this, StartActivity.class, null);
+        }
+        if (mode == config.ACCELEROMETER_INPUT) {
+            //accelMode.unregister();
+        } else if (mode == config.FACE_INPUT) {
             // TODO
         }
     }
 
-    @Override
-    public void onMapReady(final GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        googleMap.getUiSettings().setRotateGesturesEnabled(false);
-        googleMap.getUiSettings().setTiltGesturesEnabled(false);
-        googleMap.getUiSettings().setCompassEnabled(false);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, startZoom));
-        googleMap.setOnCameraChangeListener(this);
+    /// HELPER
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        onCameraChange(googleMap.getCameraPosition());
-                    }
-                });
-            }
-        }, 0, 100);
+    void loadBundle() {
+        demo = bundle.getBoolean (config.DEMO_KEY);
+        mode = bundle.getInt     (config.MODE_KEY);
+
+        if (!demo) {
+            return;
+        }
+
+        participantCode = bundle.getString  (config.PARTICIPANT_KEY);
+        groupCode       = bundle.getString  (config.GROUP_KEY);
+        sessionCode     = bundle.getString  (config.SESSION_KEY);
+        trials          = bundle.getInt     (config.TRIALS_KEY);
+        order           = bundle.getIntArray(config.ORDER_KEY);
+        runID           = bundle.getInt     (config.RUN_KEY);
+        dataDirectory   = bundle.getString  (config.DATADIR_KEY);
+        dataFile        = bundle.getString  (config.DATAFILE_KEY);
     }
 
-    @Override
-    public synchronized void onCameraChange(CameraPosition position) {
-        if (!stopped && time > 0 && position != null && position.target != null) {
-            long elapsed = System.currentTimeMillis() - time;
-            double zoomDelta = zoom - position.zoom;
-            double latDelta  = target.latitude  - position.target.latitude;
-            double longDelta = target.longitude - position.target.longitude;
-
-            mapZoom.setText(String.format(zoomDelta >= 0 ? " +%.1f " : " %.1f ", zoomDelta));
-            mapLat.setText(String.format("%.6f", position.target.latitude));
-            mapLong.setText(String.format("%.6f", position.target.longitude));
-            mapTime.setText(String.format("%02d:%02d:%03d", elapsed / 60 / 1000, elapsed / 1000, elapsed % 1000));
-            
-            // TODO
-
-            if (Math.abs(zoomDelta) <= 0.05 && Math.abs(latDelta) <= 0.0005 && Math.abs(longDelta) <= 0.0005) {
-                timer.cancel();
-                ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
-                toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
-                mapStatus.setVisibility(View.GONE);
-                mapDoneBtn.setVisibility(View.VISIBLE);
-                stopped = true;
-            }
-        }
+    void throwError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        goToActivity(this, StartActivity.class, null);
+    }
+    void throwError(Throwable e) {
+        throwError(e.getMessage());
     }
 
-    // Accelerator Mode
+    void ringTone() {
+        ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
+        toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+    }
 
-    class AcceleratorMode implements SensorEventListener {
+    /// INNER CLASSES
 
-        /*
-         * Below are the alpha values for the low-pass filter. The four values are for the slowest
-         * (NORMAL) to fastest (FASTEST) sampling rates, respectively. These values were determined by
-         * trial and error. There is a trade-off. Generally, lower values produce smooth but sluggish
-         * responses, while higher values produced jerky but fast responses.
-         * 
-         * Furthermore, there is a difference by device, particularly for the FASTEST setting. For
-         * example, the FASTEST sample rate is about 200 Hz on a Nexus 4 but only about 100 Hz on a
-         * Samsung Galaxy Tab 10.1.
-         * 
-         * Fiddle with these, as necessary.
-         */
-        final float[] ALPHA_VELOCITY = { 0.99f, 0.80f, 0.40f, 0.15f };
-        final float[] ALPHA_POSITION = { 0.50f, 0.30f, 0.15f, 0.10f };
-        
-        final float RADIANS_TO_DEGREES = 57.2957795f;    
-        float alpha;
-        float[] accValues;
-        float x, y, z, pitch, roll;
-    
-        SensorManager sensorMgr;
-        Sensor sensor;
-    
-        void enableAcceleratorMode() {
-            sensorMgr = (SensorManager)getSystemService(SENSOR_SERVICE);
-            sensor = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            alpha = ALPHA_POSITION[2];
-            if (sensor == null) {
-                Toast.makeText(MapActivity.this, "No accelerator", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), StartActivity.class));
-                finish();
+    class DataLogger implements Closeable {
+
+        File             file;
+        FileOutputStream outStream;
+        PrintWriter      writer;
+
+        DataLogger() {
+            try {
+                file      = new File(dataDirectory, dataFile);
+                outStream = new FileOutputStream(file, true);
+                writer    = new PrintWriter(outStream, true);
+            } catch (IOException e) {
+                throwError(e);
             }
         }
 
-        /**
-         * Low pass filter. The algorithm requires tracking only two numbers - the prior number and the
-         * new number. There is a time constant "alpha" which determines the amount of smoothing. Alpha
-         * is like a "weight" or "momentum". It determines the effect of the new value on the current
-         * smoothed value.
-         * 
-         * A lower alpha means more smoothing. NOTE: 0 <= alpha <= 1.
-         * 
-         * See...
-         * 
-         * http://blog.thomnichols.org/2011/08/smoothing-sensor-data-with-a-low-pass-filter
-         */
-        protected float[] lowPass(float[] input, float[] output, float alpha) {
-            for (int i = 0; i < input.length; i++) {
-                output[i] = output[i] + alpha * (input[i] - output[i]);
+        void writeHeader() {
+            write("trial"          , "participant", "group",
+                  "session"        , "mode"       , "targetLatitude",
+                  "targetLongitude", "targetZoom" , "latitude",
+                  "longitude"      , "zoom"       , "millis");
+        }
+
+        void writeRecord(LatLng target, float targetZoom, LatLng position, float zoom, long millis) {
+            writeRecord(runID + 1, participantCode, groupCode, sessionCode, mode,
+                        target.latitude, target.longitude, targetZoom,
+                        position.latitude, position.longitude, zoom, millis);
+        }
+
+        void writeRecord(int    trial          , String participant, String group,
+                         String session        , int    mode       , double targetLatitude,
+                         double targetLongitude, float  targetZoom , double latitude,
+                         double longitude      , float  zoom       , long   millis)
+        {
+            write(trial          , participant, group,
+                  session        , mode       , targetLatitude,
+                  targetLongitude, targetZoom , latitude,
+                  longitude      , zoom       , millis);
+        }
+
+        public void write(Object... elements) {
+            writer.println(StringUtils.join(",", elements));
+        }
+
+        @Override
+        public void close() throws IOException {
+            writer.flush();
+            writer.close();
+            outStream.close();
+        }
+
+    } // DataLogger
+
+    class MapActivityUI {
+
+        TextView     mapLat;
+        TextView     mapLong;
+        TextView     mapZoom;
+        TextView     mapTime;
+        LinearLayout mapStatus;
+        Button       mapStartBtn;
+        Button       mapDoneBtn;
+        MapFragment  mapFragment;
+
+        MapActivityUI() {
+            mapLat      = (TextView)     findViewById(R.id.mapLat);
+            mapLong     = (TextView)     findViewById(R.id.mapLong);
+            mapZoom     = (TextView)     findViewById(R.id.mapZoom);
+            mapTime     = (TextView)     findViewById(R.id.mapTime);
+            mapStatus   = (LinearLayout) findViewById(R.id.mapStatus);
+            mapStartBtn = (Button)       findViewById(R.id.mapStartBtn);
+            mapDoneBtn  = (Button)       findViewById(R.id.mapDoneBtn);
+            mapFragment = (MapFragment)  getFragmentManager().findFragmentById(R.id.map);
+
+            mapFragment.getMapAsync(MapActivity.this.mMap);
+            fullscreen();
+        }
+
+        void fullscreen() {
+            getActionBar().hide();
+            if (Build.VERSION.SDK_INT < 16) {
+                getWindow().setFlags(
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else {
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
             }
-            return output;
-        }
-    
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            accValues = lowPass(event.values.clone(), accValues, alpha);
-            x = accValues[0];
-            y = -accValues[1]; // MOBIFIED for SAMSUNG DEVICE
-            z = accValues[2];
-            pitch = (float)Math.atan(y / Math.sqrt(x * x + z * z)) * RADIANS_TO_DEGREES;
-            roll = (float)Math.atan(x / Math.sqrt(y * y + z * z)) * RADIANS_TO_DEGREES;
-        }
-    
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            // Nothing to do
         }
 
-    } // AcceleratorMode
+        void updateStatus(double latitude, double longitude, float zoom, long time) {
+            latitude  = ((double) Math.round(latitude  * Math.pow(10, 6))) / Math.pow(10, 6);
+            longitude = ((double) Math.round(longitude * Math.pow(10, 6))) / Math.pow(10, 6);
+            zoom      = ((float)  Math.round(zoom * 10)) / 10;
 
+            mapLat .setText((latitude  >= 0 ? "+" : "") + String.format("%.6f", latitude));
+            mapLong.setText((longitude >= 0 ? "+" : "") + String.format("%.6f", longitude));
+            mapZoom.setText((zoom      >= 0 ? "+" : "") + String.format("%.1f", zoom));
+            mapTime.setText(String.format("%02d:%02d:%03d", time / 60 / 1000, time / 1000, time % 1000));
+        }
+
+        void onStart() {
+            mapStartBtn.setVisibility(View.GONE);
+            mapStatus.setVisibility(View.VISIBLE);
+        }
+
+        void onDone() {
+            mapStatus.setVisibility(View.GONE);
+            mapDoneBtn.setVisibility(View.VISIBLE);
+        }
+
+    } // MapActivityUI
+
+    class Map implements OnMapReadyCallback {
+
+        GoogleMap googleMap;
+        LatLng initPosition;
+        LatLng targetPosition;
+        float initZoom;
+        float targetZoom;
+
+        Map() {
+            initPosition = new LatLng(config.defaultLatitude, config.defaultLongitude);
+            initZoom = config.defaultZoom;
+        }
+
+        @Override
+        public void onMapReady(GoogleMap gMap) {
+            googleMap = gMap;
+            googleMap.getUiSettings().setRotateGesturesEnabled(false);
+            googleMap.getUiSettings().setTiltGesturesEnabled(false);
+            googleMap.getUiSettings().setCompassEnabled(false);
+            googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
+            googleMap.getUiSettings().setMapToolbarEnabled(false);
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initPosition, initZoom));
+            if (mode != config.TOUCH_INPUT) {
+                //googleMap.getUiSettings().setAllGesturesEnabled(false);
+            }
+        }
+
+        boolean isMapReady() {
+            return googleMap != null;
+        }
+
+        void addTarget() {
+            LatLngBounds bounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+            LatLng ne = bounds.northeast;
+            LatLng sw = bounds.southwest;
+            LatLng delta = new LatLng(sw.latitude - ne.latitude, sw.longitude - ne.longitude);
+
+            targetPosition = new LatLng(
+                    ne.latitude  + delta.latitude  * 0.2 + Math.random() * delta.latitude  * 0.6,
+                    ne.longitude + delta.longitude * 0.2 + Math.random() * delta.longitude * 0.6);
+            targetZoom = config.targetMinZoom + (float) Math.random() * (config.targetMaxZoom - config.targetMinZoom);
+            googleMap.addMarker(new MarkerOptions().position(targetPosition));
+        }
+
+//        void updateMapByAcc(double tiltAngle, double tiltMagnitude, float velocityZ) {
+//            double d = tiltMagnitude * accelMode.GAIN;
+//            float dX = (float) ( Math.sin(tiltAngle * accelMode.DEGREES_TO_RADIANS) * d);
+//            float dY = (float) (-Math.cos(tiltAngle * accelMode.DEGREES_TO_RADIANS) * d);
+//
+//            googleMap.moveCamera(CameraUpdateFactory.zoomBy(velocityZ / 100));
+//            googleMap.moveCamera(CameraUpdateFactory.scrollBy(dX, dY));
+//        }
+
+    } // Map
+
+    class Scheduler extends CountDownTimer implements Runnable {
+
+        Scheduler(long delay, long interval) {
+            super(delay, interval);
+        }
+
+        @Override public void onTick(long millisUntilFinished) {} // Nothing to do
+        @Override public void onFinish() { run(); }
+
+        @Override
+        public void run() {
+            if (!startExperiment) {
+                start(); return;
+            }
+            CameraPosition position = mMap.googleMap.getCameraPosition();
+            Projection projection   = mMap.googleMap.getProjection();
+
+            long elapsed = System.currentTimeMillis() - initTime;
+            double dLat  = mMap.targetPosition.latitude  - position.target.latitude;
+            double dLong = mMap.targetPosition.longitude - position.target.longitude;
+            float dZoom  = mMap.targetZoom - position.zoom;
+
+            Point targetPoint   = projection.toScreenLocation(mMap.targetPosition);
+            Point positionPoint = projection.toScreenLocation(position.target);
+            Point dPoint        = new Point(targetPoint.x - positionPoint.x, targetPoint.y - positionPoint.y);
+
+            ui.updateStatus(dLat, dLong, dZoom, elapsed);
+            if (!demo) {
+                logger.writeRecord(mMap.targetPosition, mMap.targetZoom, position.target, position.zoom, elapsed);
+            }
+            if (Math.abs(dZoom) <= 0.1 && Math.abs(dPoint.x) <= 5 && Math.abs(dPoint.y) <= 5) {
+                if (mode == config.ACCELEROMETER_INPUT) {
+                    //accelMode.unregister();
+                } else if (mode == config.FACE_INPUT) {
+                    // TODO
+                }
+                ui.onDone();
+                ringTone();
+                cancel();
+            } else {
+                start();
+            }
+        }
+
+    } // Scheduler
+
+//    class AccelerometerMode implements SensorEventListener {
+//
+//        final float GAIN = 0.1f;
+//        final float RADIANS_TO_DEGREES = 57.2957795f;
+//        final float DEGREES_TO_RADIANS = 0.0174532925f;
+//        final float[] ALPHA_VELOCITY = { 0.99f, 0.80f, 0.40f, 0.15f };
+//        final float[] ALPHA_POSITION = { 0.50f, 0.30f, 0.15f, 0.10f };
+//        final float MAX_MAGNITUDE = 45f;
+//        final float alpha = ALPHA_POSITION[2];
+//
+//        SensorManager sensorManager;
+//        Sensor sensor;
+//        Stack<Float[]> accValues = new Stack<Float[]>();
+//        float[] velocity;
+//        long time;
+//
+//        AccelerometerMode() {
+//            sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+//            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//            if (sensor == null) {
+//                throwError("Accelerometer not supported");
+//            }
+//            Float[] acc = new Float[3];
+//            Arrays.fill(acc, 0f);
+//            accValues.push(acc);
+//        }
+//
+//        void register() {
+//            initTime = System.currentTimeMillis();
+//            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+//        }
+//
+//        void unregister() {
+//            sensorManager.unregisterListener(this);
+//        }
+//
+//        void updateAcceleration(SensorEvent event) {
+//            Float[] lastAcc = accValues.peek();
+//            Float[] acc = lowPass(event.values, lastAcc, alpha);
+//            float accX  =  (acc[0] - lastAcc[0]);
+//            float accY  = -(acc[1] - lastAcc[1]);
+//            float accZ  =  (acc[2] - lastAcc[2]);
+//            float pitch = (float)Math.atan(accY / Math.sqrt(accX * accX + accZ * accZ)) * RADIANS_TO_DEGREES;
+//            float roll  = (float)Math.atan(accX / Math.sqrt(accY * accY + accZ * accZ)) * RADIANS_TO_DEGREES;
+//            float tiltMagnitude = (float)Math.sqrt(pitch * pitch + roll * roll);
+//            float tiltAngle     = tiltMagnitude == 0f ? 0f : (float)Math.asin(roll / tiltMagnitude) * RADIANS_TO_DEGREES;
+//
+//            if (pitch > 0 && roll > 0) {
+//                tiltAngle = 360f - tiltAngle;
+//            } else if (pitch > 0 && roll < 0) {
+//                tiltAngle = -tiltAngle;
+//            } else if (pitch < 0 && roll > 0) {
+//                tiltAngle = tiltAngle + 180f;
+//            } else if (pitch < 0 && roll < 0) {
+//                tiltAngle = tiltAngle + 180f;
+//            }
+//
+//            float deltaTime = (float)(System.currentTimeMillis() - time) / 1000f;
+//            velocity[0] += accX * deltaTime;
+//            velocity[1] += accY * deltaTime;
+//            velocity[2] += accZ * deltaTime;
+//
+//            time = System.currentTimeMillis();
+//            tiltMagnitude = tiltMagnitude > MAX_MAGNITUDE ? MAX_MAGNITUDE : tiltMagnitude;
+//            mMap.updateMapByAcc(tiltAngle, tiltMagnitude, velocity[2]);
+//            accValues.push(acc);
+//        }
+//
+//        Float[] lowPass(float[] input, Float[] last, float alpha) {
+//            Float[] output = new Float[input.length];
+//            for (int i = 0; i < input.length; i++) {
+//                output[i] = last[i] + alpha * (input[i] - last[i]);
+//            }
+//            return output;
+//        }
+//
+//        boolean isStationary(double accX, double accY, double accZ) {
+//            double g;
+//            if (Math.abs(accX) <= 0.5) {
+//                g = Math.sqrt(accY * accY + accZ * accZ);
+//            } else if (Math.abs(accY) <= 0.5) {
+//                g = Math.sqrt(accX * accX + accZ * accZ);
+//            } else {
+//                return false;
+//            }
+//            return g >= 9.5 && g <= 10.0;
+//        }
+//
+//        @Override public void onAccuracyChanged(Sensor sensor, int accuracy) { } // Nothing to do
+//
+//        @Override
+//        public void onSensorChanged(SensorEvent event) {
+//            if (startExperiment) {
+//                updateAcceleration(event);
+//            } else if (isStationary(event.values[0], event.values[1], event.values[2])) {
+//                if (initTime + 10 * 1000 <= System.currentTimeMillis()) {
+//                    velocity = new float[3];
+//                    time = System.currentTimeMillis();
+//                    startExperiment = true;
+//                    mMap.addTarget();
+//                    ringTone();
+//                }
+//            } else {
+//                initTime = System.currentTimeMillis();
+//            }
+//        }
+//
+//    } // AccelerometerMode
+
+    
+    
 } // MapActivity

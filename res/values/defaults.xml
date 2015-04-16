@@ -23,6 +23,7 @@
 	<string name="configDefaultLatitude">43.773056</string>
 	<string name="configDefaultLongitude">-79.503611</string>
 	<string name="configDefaultZoom">10</string>
-	<string name="configTargetZoom">15</string>
+	<string name="configTargetMinZoom">11</string>
+	<string name="configTargetMaxZoom">16</string>
 
 </resources>

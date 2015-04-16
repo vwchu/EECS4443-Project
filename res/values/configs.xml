@@ -5,9 +5,9 @@
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
-  
+
           http://www.apache.org/licenses/LICENSE-2.0
-  
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,12 +17,32 @@
 
 <resources>
 
+    <item type="integer" name="constTouchModeID">0</item>
+    <item type="integer" name="constAccelModeID">1</item>
+    <item type="integer" name="constFaceModeID">2</item>
+
+    <string name="constKeyDemo">demo</string>
+    <string name="constKeyMode">mode</string>
+    <string name="constKeyParticipant">participantCode</string>
+    <string name="constKeyGroup">groupCode</string>
+    <string name="constKeySession">sessionCode</string>
+    <string name="constKeyTrials">trials</string>
+    <string name="constKeyOrder">ordering</string>
+    <string name="constKeyRunID">runID</string>
+    <string name="constKeyDataFile">dataFile</string>
+    <string name="constKeyDataDirectory">dataDirectory</string>
+
     <string name="dataDirectory">/Documents/EECS4443ProjectData</string>
-    <string name="dataFilenameFormat">Data-%1$s-%2$s-%3$s.csv</string><!-- P01, G01, B01 -->
+    <string name="dataFilenameFormat">Data-%1$s-%2$s-%3$s.csv</string><!-- P01, G01, S01 -->
 
     <item type="integer" name="configParticipants">12</item>
-    <item type="integer" name="configGroups">6</item>
+    <item type="integer" name="configGroups">3</item>
     <item type="integer" name="configTrials">10</item>
+
+    <string name="configParticipantFormat">P%02d</string>
+    <string name="configGroupFormat">G%02d</string>
+    <string name="configSessionFormat">S%02d</string>
+    <string name="configTrialFormat">%d</string>
 
     <string-array name="configModes">
         <item>TOUCH</item>
@@ -32,7 +52,7 @@
 
 	<string-array name="configModeNames">
         <item>Touch-based</item>
-        <item>Accelerator-based</item>
+        <item>Accelerometer-based</item>
         <item>Facial tracking</item>
     </string-array>
 
@@ -44,5 +64,11 @@
         <item>FACE,TOUCH,ACCEL</item>
         <item>FACE,ACCEL,TOUCH</item>
     </string-array>
+
+    <integer-array name="configGroupOrdering">
+        <item>0</item><!-- G01: TOUCH,ACCEL,FACE -->
+        <item>4</item><!-- G02: FACE,TOUCH,ACCEL -->
+        <item>3</item><!-- G03: ACCEL,FACE,TOUCH -->
+    </integer-array>
 
 </resources>
