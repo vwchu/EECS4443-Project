@@ -33,7 +33,6 @@ class AppConfig {
     final String APP;
     final String LOG_KEY;
     final int    TOUCH_INPUT;
-    final int    ACCELEROMETER_INPUT;
     final int    FACE_INPUT;
     final String DEMO_KEY;
     final String MODE_KEY;
@@ -50,11 +49,8 @@ class AppConfig {
 
         APP                = r.getString(R.string.app_name);
         LOG_KEY            = r.getString(R.string.app_name);
-
         TOUCH_INPUT        = r.getInteger(R.integer.constTouchModeID);
-        ACCELEROMETER_INPUT  = r.getInteger(R.integer.constAccelModeID);
         FACE_INPUT         = r.getInteger(R.integer.constFaceModeID);
-
         DEMO_KEY           = r.getString(R.string.constKeyDemo);
         MODE_KEY           = r.getString(R.string.constKeyMode);
         PARTICIPANT_KEY    = r.getString(R.string.constKeyParticipant);

@@ -1,12 +1,17 @@
 package ca.yorku.eecs.cse13261.eecs4443project;
 
 import java.io.*;
-import java.util.*;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
-import android.app.*;
+import android.util.Log;
+import android.hardware.Camera;
+import android.hardware.Camera.*;
 import android.graphics.*;
-import android.hardware.*;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.GoogleMap.*;
+import com.google.android.gms.maps.model.*;
+import com.qualcomm.snapdragon.sdk.face.*;
+import com.qualcomm.snapdragon.sdk.face.FacialProcessing.*;
+import android.app.*;
+import android.content.res.*;
 import android.media.*;
 import android.os.*;
 import android.view.*;
@@ -27,7 +32,7 @@ public class MapActivity extends Activity {
     AppConfig config;
     MapActivityUI ui;
     DataLogger logger;
-    //AccelerometerMode accelMode;
+    FaceTrackingMode faceMode;
     Scheduler timer;
     Bundle bundle;
     Map mMap;
@@ -64,20 +69,29 @@ public class MapActivity extends Activity {
                 logger.writeHeader();
             }
         }
-        if (mode == config.ACCELEROMETER_INPUT) {
-            //accelMode = new AccelerometerMode();
-        } else if (mode == config.FACE_INPUT) {
-            // TODO
+        if (mode == config.FACE_INPUT) {
+            faceMode = new FaceTrackingMode(getResources());
+            //ui.fpView.setVisibility(View.VISIBLE);
+            ui.onStart();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mode == config.ACCELEROMETER_INPUT) {
-            //accelMode.unregister();
-        } else if (mode == config.FACE_INPUT) {
-            // TODO
+        if (mode == config.FACE_INPUT) {
+            faceMode.stopCamera();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mode == config.FACE_INPUT) {
+            if (faceMode.camera != null) {
+                faceMode.stopCamera();
+            }
+            faceMode.startCamera();
         }
     }
 
@@ -89,13 +103,11 @@ public class MapActivity extends Activity {
             ui.onStart();
 
             if (mode == config.TOUCH_INPUT) {
+                mMap.googleMap.getUiSettings().setScrollGesturesEnabled(true);
+                mMap.googleMap.getUiSettings().setZoomGesturesEnabled(true);
                 startExperiment = true;
                 mMap.addTarget();
                 ringTone();
-            } else if (mode == config.ACCELEROMETER_INPUT) {
-                //accelMode.register();
-            } else if (mode == config.FACE_INPUT) {
-                // TODO
             }
             timer.run();
         }
@@ -105,11 +117,7 @@ public class MapActivity extends Activity {
         if (demo) {
             goToActivity(this, StartActivity.class, null);
         }
-        if (mode == config.ACCELEROMETER_INPUT) {
-            //accelMode.unregister();
-        } else if (mode == config.FACE_INPUT) {
-            // TODO
-        }
+        // TODO
     }
 
     /// HELPER
@@ -210,6 +218,7 @@ public class MapActivity extends Activity {
         Button       mapStartBtn;
         Button       mapDoneBtn;
         MapFragment  mapFragment;
+        SurfaceView  fpView;
 
         MapActivityUI() {
             mapLat      = (TextView)     findViewById(R.id.mapLat);
@@ -220,6 +229,7 @@ public class MapActivity extends Activity {
             mapStartBtn = (Button)       findViewById(R.id.mapStartBtn);
             mapDoneBtn  = (Button)       findViewById(R.id.mapDoneBtn);
             mapFragment = (MapFragment)  getFragmentManager().findFragmentById(R.id.map);
+            fpView      = (SurfaceView)  findViewById(R.id.fpView);
 
             mapFragment.getMapAsync(MapActivity.this.mMap);
             fullscreen();
@@ -259,7 +269,7 @@ public class MapActivity extends Activity {
 
     } // MapActivityUI
 
-    class Map implements OnMapReadyCallback {
+    class Map implements OnMapReadyCallback, OnMarkerClickListener {
 
         GoogleMap googleMap;
         LatLng initPosition;
@@ -275,17 +285,14 @@ public class MapActivity extends Activity {
         @Override
         public void onMapReady(GoogleMap gMap) {
             googleMap = gMap;
-            googleMap.getUiSettings().setRotateGesturesEnabled(false);
-            googleMap.getUiSettings().setTiltGesturesEnabled(false);
+            googleMap.getUiSettings().setAllGesturesEnabled(false);
             googleMap.getUiSettings().setCompassEnabled(false);
             googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
             googleMap.getUiSettings().setMapToolbarEnabled(false);
             googleMap.getUiSettings().setZoomControlsEnabled(false);
             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+            googleMap.setOnMarkerClickListener(this);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initPosition, initZoom));
-            if (mode != config.TOUCH_INPUT) {
-                //googleMap.getUiSettings().setAllGesturesEnabled(false);
-            }
         }
 
         boolean isMapReady() {
@@ -305,14 +312,13 @@ public class MapActivity extends Activity {
             googleMap.addMarker(new MarkerOptions().position(targetPosition));
         }
 
-//        void updateMapByAcc(double tiltAngle, double tiltMagnitude, float velocityZ) {
-//            double d = tiltMagnitude * accelMode.GAIN;
-//            float dX = (float) ( Math.sin(tiltAngle * accelMode.DEGREES_TO_RADIANS) * d);
-//            float dY = (float) (-Math.cos(tiltAngle * accelMode.DEGREES_TO_RADIANS) * d);
-//
-//            googleMap.moveCamera(CameraUpdateFactory.zoomBy(velocityZ / 100));
-//            googleMap.moveCamera(CameraUpdateFactory.scrollBy(dX, dY));
-//        }
+        void updateMapByFaceTracking(int dX, int dY, float dZ) {
+            googleMap.moveCamera(CameraUpdateFactory.zoomBy(dZ));
+            googleMap.moveCamera(CameraUpdateFactory.scrollBy(dX, dY));
+        }
+
+        // Override: Do nothing
+        @Override public boolean onMarkerClick(Marker marker) {return true;}
 
     } // Map
 
@@ -347,10 +353,8 @@ public class MapActivity extends Activity {
                 logger.writeRecord(mMap.targetPosition, mMap.targetZoom, position.target, position.zoom, elapsed);
             }
             if (Math.abs(dZoom) <= 0.1 && Math.abs(dPoint.x) <= 5 && Math.abs(dPoint.y) <= 5) {
-                if (mode == config.ACCELEROMETER_INPUT) {
-                    //accelMode.unregister();
-                } else if (mode == config.FACE_INPUT) {
-                    // TODO
+                if (mode == config.FACE_INPUT) {
+                    faceMode.stopCamera();
                 }
                 ui.onDone();
                 ringTone();
@@ -362,115 +366,95 @@ public class MapActivity extends Activity {
 
     } // Scheduler
 
-//    class AccelerometerMode implements SensorEventListener {
-//
-//        final float GAIN = 0.1f;
-//        final float RADIANS_TO_DEGREES = 57.2957795f;
-//        final float DEGREES_TO_RADIANS = 0.0174532925f;
-//        final float[] ALPHA_VELOCITY = { 0.99f, 0.80f, 0.40f, 0.15f };
-//        final float[] ALPHA_POSITION = { 0.50f, 0.30f, 0.15f, 0.10f };
-//        final float MAX_MAGNITUDE = 45f;
-//        final float alpha = ALPHA_POSITION[2];
-//
-//        SensorManager sensorManager;
-//        Sensor sensor;
-//        Stack<Float[]> accValues = new Stack<Float[]>();
-//        float[] velocity;
-//        long time;
-//
-//        AccelerometerMode() {
-//            sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-//            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//            if (sensor == null) {
-//                throwError("Accelerometer not supported");
-//            }
-//            Float[] acc = new Float[3];
-//            Arrays.fill(acc, 0f);
-//            accValues.push(acc);
-//        }
-//
-//        void register() {
-//            initTime = System.currentTimeMillis();
-//            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-//        }
-//
-//        void unregister() {
-//            sensorManager.unregisterListener(this);
-//        }
-//
-//        void updateAcceleration(SensorEvent event) {
-//            Float[] lastAcc = accValues.peek();
-//            Float[] acc = lowPass(event.values, lastAcc, alpha);
-//            float accX  =  (acc[0] - lastAcc[0]);
-//            float accY  = -(acc[1] - lastAcc[1]);
-//            float accZ  =  (acc[2] - lastAcc[2]);
-//            float pitch = (float)Math.atan(accY / Math.sqrt(accX * accX + accZ * accZ)) * RADIANS_TO_DEGREES;
-//            float roll  = (float)Math.atan(accX / Math.sqrt(accY * accY + accZ * accZ)) * RADIANS_TO_DEGREES;
-//            float tiltMagnitude = (float)Math.sqrt(pitch * pitch + roll * roll);
-//            float tiltAngle     = tiltMagnitude == 0f ? 0f : (float)Math.asin(roll / tiltMagnitude) * RADIANS_TO_DEGREES;
-//
-//            if (pitch > 0 && roll > 0) {
-//                tiltAngle = 360f - tiltAngle;
-//            } else if (pitch > 0 && roll < 0) {
-//                tiltAngle = -tiltAngle;
-//            } else if (pitch < 0 && roll > 0) {
-//                tiltAngle = tiltAngle + 180f;
-//            } else if (pitch < 0 && roll < 0) {
-//                tiltAngle = tiltAngle + 180f;
-//            }
-//
-//            float deltaTime = (float)(System.currentTimeMillis() - time) / 1000f;
-//            velocity[0] += accX * deltaTime;
-//            velocity[1] += accY * deltaTime;
-//            velocity[2] += accZ * deltaTime;
-//
-//            time = System.currentTimeMillis();
-//            tiltMagnitude = tiltMagnitude > MAX_MAGNITUDE ? MAX_MAGNITUDE : tiltMagnitude;
-//            mMap.updateMapByAcc(tiltAngle, tiltMagnitude, velocity[2]);
-//            accValues.push(acc);
-//        }
-//
-//        Float[] lowPass(float[] input, Float[] last, float alpha) {
-//            Float[] output = new Float[input.length];
-//            for (int i = 0; i < input.length; i++) {
-//                output[i] = last[i] + alpha * (input[i] - last[i]);
-//            }
-//            return output;
-//        }
-//
-//        boolean isStationary(double accX, double accY, double accZ) {
-//            double g;
-//            if (Math.abs(accX) <= 0.5) {
-//                g = Math.sqrt(accY * accY + accZ * accZ);
-//            } else if (Math.abs(accY) <= 0.5) {
-//                g = Math.sqrt(accX * accX + accZ * accZ);
-//            } else {
-//                return false;
-//            }
-//            return g >= 9.5 && g <= 10.0;
-//        }
-//
-//        @Override public void onAccuracyChanged(Sensor sensor, int accuracy) { } // Nothing to do
-//
-//        @Override
-//        public void onSensorChanged(SensorEvent event) {
-//            if (startExperiment) {
-//                updateAcceleration(event);
-//            } else if (isStationary(event.values[0], event.values[1], event.values[2])) {
-//                if (initTime + 10 * 1000 <= System.currentTimeMillis()) {
-//                    velocity = new float[3];
-//                    time = System.currentTimeMillis();
-//                    startExperiment = true;
-//                    mMap.addTarget();
-//                    ringTone();
-//                }
-//            } else {
-//                initTime = System.currentTimeMillis();
-//            }
-//        }
-//
-//    } // AccelerometerMode
+    class FaceTrackingMode implements PreviewCallback {
 
-    
+        static final int FRONT_CAMERA_INDEX = 1;
+        
+        Resources res;
+        Camera camera;
+        FacialProcessing faceProc;
+        FaceData face = null;
+        FaceData lastFace = null;
+        
+        public FaceTrackingMode(Resources resources) {
+            if (!FacialProcessing.isFeatureSupported(FacialProcessing.FEATURE_LIST.FEATURE_FACIAL_PROCESSING)) {
+                throwError("Facial processing is not supported");
+            }
+            res = resources;
+            startCamera();
+        }
+
+        void startCamera() {
+            try {
+                camera = Camera.open(FRONT_CAMERA_INDEX);
+                camera.setPreviewCallback(this);
+                camera.startPreview();
+                if (faceProc == null) {
+                    faceProc = FacialProcessing.getInstance();
+                    faceProc.setProcessingMode(FP_MODES.FP_MODE_VIDEO);
+                }
+            } catch (Exception e) {
+                throwError("Failed to start facial processing");
+            }
+        }
+
+        void stopCamera() {
+            if (camera != null) {
+                camera.stopPreview();
+                camera.setPreviewCallback(null);
+                camera.release();
+                faceProc.release();
+                faceProc = null;
+            }
+            camera = null;
+        }
+
+        void coolDownPeriod() {
+            if (lastFace == null) {
+                lastFace = face;
+            } else if (initTime + 10 * 1000 <= System.currentTimeMillis()) {
+                startExperiment = true;
+                mMap.addTarget();
+                ringTone();
+            }
+        }
+        
+        void updateMapPosition() {
+            if (face.leftEye == null || face.rightEye == null) { lastFace = null; return; }
+            if (lastFace == null) { lastFace = face; return; }
+            int dX = (face.leftEye.x + face.rightEye.x) / 2 - (lastFace.leftEye.x + lastFace.rightEye.x) / 2;
+            int dY = (face.leftEye.y + face.rightEye.y) / 2 - (lastFace.leftEye.y + lastFace.rightEye.y) / 2;
+            float dZ = (float)(face.rightEye.x - face.leftEye.x) / (float)(lastFace.rightEye.x - lastFace.leftEye.x); 
+            mMap.updateMapByFaceTracking(dX, dY, dZ);
+        }
+
+        @Override
+        public void onPreviewFrame(byte[] data, Camera camera) {
+            Display display  = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+            Size previewSize = camera.getParameters().getPreviewSize();
+
+            PREVIEW_ROTATION_ANGLE angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0;
+            switch (display.getRotation()) {
+                case 0: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_90; break;
+                case 1: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0; break;
+                case 3: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_180; break;
+                case 2: break; // This case is never reached.
+            }
+            
+            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+            Log.i(config.LOG_KEY, "FACES: " + faceProc.getNumFaces());
+            if (faceProc.getNumFaces() == 0) {
+                lastFace = null;
+            } else {
+                face = faceProc.getFaceData()[0];
+                if (!startExperiment) {
+                    coolDownPeriod();
+                } else {
+                    updateMapPosition();
+                }
+            }
+        }
+
+    } // FaceTrackingMode
     
 } // MapActivity

@@ -46,29 +46,22 @@
 
     <string-array name="configModes">
         <item>TOUCH</item>
-        <item>ACCEL</item>
         <item>FACE</item>
     </string-array>
 
 	<string-array name="configModeNames">
         <item>Touch-based</item>
-        <item>Accelerometer-based</item>
         <item>Facial tracking</item>
     </string-array>
 
     <string-array name="configOrders">
-        <item>TOUCH,ACCEL,FACE</item>
-        <item>TOUCH,FACE,ACCEL</item>
-        <item>ACCEL,TOUCH,FACE</item>
-        <item>ACCEL,FACE,TOUCH</item>
-        <item>FACE,TOUCH,ACCEL</item>
-        <item>FACE,ACCEL,TOUCH</item>
+        <item>TOUCH,FACE</item>
+        <item>FACE,TOUCH</item>
     </string-array>
 
     <integer-array name="configGroupOrdering">
-        <item>0</item><!-- G01: TOUCH,ACCEL,FACE -->
-        <item>4</item><!-- G02: FACE,TOUCH,ACCEL -->
-        <item>3</item><!-- G03: ACCEL,FACE,TOUCH -->
+        <item>0</item><!-- G01: TOUCH,FACE -->
+        <item>1</item><!-- G02: FACE,TOUCH -->
     </integer-array>
 
 </resources>

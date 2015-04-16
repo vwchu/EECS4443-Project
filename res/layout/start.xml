@@ -33,17 +33,6 @@
 	    android:layout_height="wrap_content"
 	    android:layout_weight=".3"
 	    android:layout_margin="5dp"
-	    android:onClick="clickDemoAccel"
-	    android:text="@string/start_demo_accel"
-	    android:textAppearance="?android:attr/textAppearanceMedium" >
-	
-	</Button>
-	
-	<Button
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight=".3"
-	    android:layout_margin="5dp"
 	    android:onClick="clickDemoFace"
 	    android:text="@string/start_demo_face"
 	    android:textAppearance="?android:attr/textAppearanceMedium" >

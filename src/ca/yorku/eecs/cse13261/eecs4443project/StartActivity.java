@@ -45,15 +45,6 @@ public class StartActivity extends Activity {
     }
 
     /**
-     * Called when the "Demo Accelerometer"
-     * button is pressed. Go to "Map
-     * Activity".
-     */
-    public void clickDemoAccel(View view) {
-        clickDemo(view, config.ACCELEROMETER_INPUT);
-    }
-
-    /**
      * Called when the "Demo Facial Tracking"
      * button is pressed. Go to "Map
      * Activity".
