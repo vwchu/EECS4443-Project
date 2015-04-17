@@ -28,6 +28,15 @@ class AppConfig {
     float    defaultZoom;
     float    targetMinZoom;
     float    targetMaxZoom;
+    float    touchZoomThreshold;
+    int      touchXThreshold;
+    int      touchYThreshold;
+    int      touchStartDelay;
+    float    faceZoomThreshold;
+    int      faceXThreshold;
+    int      faceYThreshold;
+    int      faceStartDelay;
+    int      faceErrorTolerance;
 
     // Constants
     final String APP;
@@ -84,6 +93,16 @@ class AppConfig {
         defaultZoom        =  Float.parseFloat (r.getString(R.string.configDefaultZoom));
         targetMinZoom      =  Float.parseFloat (r.getString(R.string.configTargetMinZoom));
         targetMaxZoom      =  Float.parseFloat (r.getString(R.string.configTargetMaxZoom));
+        touchZoomThreshold =  Float.parseFloat (r.getString(R.string.touchZoomThreshold));
+        faceZoomThreshold  =  Float.parseFloat (r.getString(R.string.faceZoomThreshold));
+
+        touchXThreshold    = r.getInteger(R.integer.touchXThreshold);
+        touchYThreshold    = r.getInteger(R.integer.touchYThreshold);
+        touchStartDelay    = r.getInteger(R.integer.touchStartDelay);
+        faceXThreshold     = r.getInteger(R.integer.faceXThreshold);
+        faceYThreshold     = r.getInteger(R.integer.faceYThreshold);
+        faceStartDelay     = r.getInteger(R.integer.faceStartDelay);
+        faceErrorTolerance = r.getInteger(R.integer.faceErrorTolerance);
 
         modesMap   = new HashMap<String, String>();
         modesIndex = new HashMap<String, Integer>();

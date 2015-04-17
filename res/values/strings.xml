@@ -11,6 +11,9 @@
     <string name="map_label_long">Longitude</string>
     <string name="map_label_zoom">Zoom</string>
     <string name="map_label_time">Time</string>
+    
+    <string name="map_default_value">--</string>
+    <string name="map_default_time">--:--:---</string>
 
     <!-- Start -->
     <string name="start_title">Start</string>

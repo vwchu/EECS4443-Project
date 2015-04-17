@@ -9,6 +9,13 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:paddingBottom="80dp" >
+       
+	    <FrameLayout
+	        android:id="@+id/cameraPreview"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_gravity="center"
+			android:visibility="invisible" />
 
 	    <fragment
 	        android:id="@+id/map"
@@ -16,13 +23,12 @@
 			android:layout_height="match_parent"
 			android:name="com.google.android.gms.maps.MapFragment"
 			android:layout_gravity="center" />
-	    
-	    <SurfaceView
-	        android:id="@+id/fpView"
+
+	    <ca.yorku.eecs.cse13261.eecs4443project.DrawView
+	        android:id="@+id/fpOverlay"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:layout_gravity="center"
-			android:visibility="gone" />
+			android:layout_gravity="center" />
 
 	    <ImageView
 	        android:id="@+id/crosshair"
@@ -89,7 +95,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/map_label_lat"
+                android:text="@string/map_default_value"
                 android:textAppearance="?android:attr/textAppearanceLarge" />            
         </LinearLayout>
 
@@ -110,7 +116,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/map_label_long"
+                android:text="@string/map_default_value"
                 android:textAppearance="?android:attr/textAppearanceLarge" />            
         </LinearLayout>
         
@@ -131,7 +137,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/map_label_zoom"
+                android:text="@string/map_default_value"
                 android:textAppearance="?android:attr/textAppearanceLarge" />            
         </LinearLayout>
 
@@ -152,7 +158,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/map_label_time"
+                android:text="@string/map_default_time"
                 android:textAppearance="?android:attr/textAppearanceLarge" />            
         </LinearLayout>
 

@@ -43,6 +43,17 @@
     <string name="configGroupFormat">G%02d</string>
     <string name="configSessionFormat">S%02d</string>
     <string name="configTrialFormat">%d</string>
+    
+    <string name="touchZoomThreshold">0.1</string>
+    <integer name="touchXThreshold">5</integer>
+    <integer name="touchYThreshold">5</integer>
+    <integer name="touchStartDelay">0</integer>
+
+    <string name="faceZoomThreshold">0.5</string>
+    <integer name="faceXThreshold">100</integer>
+    <integer name="faceYThreshold">100</integer>
+    <integer name="faceStartDelay">5</integer>
+    <integer name="faceErrorTolerance">20</integer>
 
     <string-array name="configModes">
         <item>TOUCH</item>

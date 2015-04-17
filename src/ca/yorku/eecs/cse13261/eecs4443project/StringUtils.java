@@ -30,6 +30,13 @@ public class StringUtils {
      *         is {@code null}
      */
     public static String join(CharSequence delimiter, Object... elements) {
+        String[] strings = new String[elements.length];
+        for (int i = 0; i < strings.length; i += 1) {
+            strings[i] = elements[i].toString();
+        }
+        return join(delimiter.toString(), strings);
+    }
+    public static String join(String delimiter, String... elements) {
         String dlm = "";
         StringBuilder sb = new StringBuilder();
         for (Object str : elements) {
@@ -37,7 +44,7 @@ public class StringUtils {
             if (dlm.isEmpty()) {
                 dlm = delimiter.toString();
             }
-            sb.append(str.toString());
+            sb.append(str);
         }
         return sb.toString();
     }

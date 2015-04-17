@@ -1,7 +1,7 @@
 package ca.yorku.eecs.cse13261.eecs4443project;
 
 import java.io.*;
-import android.util.Log;
+import java.util.*;
 import android.hardware.Camera;
 import android.hardware.Camera.*;
 import android.graphics.*;
@@ -49,6 +49,10 @@ public class MapActivity extends Activity {
     String  dataFile;
     long    initTime;
     boolean startExperiment;
+    float   zoomThreshold;
+    int     xThreshold;
+    int     yThreshold;
+    int     startDelay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +74,20 @@ public class MapActivity extends Activity {
             }
         }
         if (mode == config.FACE_INPUT) {
-            faceMode = new FaceTrackingMode(getResources());
-            //ui.fpView.setVisibility(View.VISIBLE);
+            initTime      = System.currentTimeMillis();
+            zoomThreshold = config.faceZoomThreshold;
+            xThreshold    = config.faceXThreshold;
+            yThreshold    = config.faceYThreshold;
+            startDelay    = config.faceStartDelay;
+            faceMode      = new FaceTrackingMode(getResources());
+
+            ui.crosshair.setVisibility(View.GONE);
             ui.onStart();
+        } else {
+            zoomThreshold = config.touchZoomThreshold;
+            xThreshold    = config.touchXThreshold;
+            yThreshold    = config.touchYThreshold;
+            startDelay    = config.touchStartDelay;
         }
     }
 
@@ -218,7 +233,9 @@ public class MapActivity extends Activity {
         Button       mapStartBtn;
         Button       mapDoneBtn;
         MapFragment  mapFragment;
-        SurfaceView  fpView;
+        FrameLayout  camPreview;
+        DrawView     fpOverlay;
+        ImageView    crosshair;
 
         MapActivityUI() {
             mapLat      = (TextView)     findViewById(R.id.mapLat);
@@ -229,7 +246,9 @@ public class MapActivity extends Activity {
             mapStartBtn = (Button)       findViewById(R.id.mapStartBtn);
             mapDoneBtn  = (Button)       findViewById(R.id.mapDoneBtn);
             mapFragment = (MapFragment)  getFragmentManager().findFragmentById(R.id.map);
-            fpView      = (SurfaceView)  findViewById(R.id.fpView);
+            camPreview  = (FrameLayout)  findViewById(R.id.cameraPreview);
+            fpOverlay   = (DrawView)     findViewById(R.id.fpOverlay);
+            crosshair   = (ImageView)    findViewById(R.id.crosshair);
 
             mapFragment.getMapAsync(MapActivity.this.mMap);
             fullscreen();
@@ -246,7 +265,21 @@ public class MapActivity extends Activity {
             }
         }
 
+        void updateFPOverlay(FaceData[] faces) {
+            if (startExperiment) {
+                float zoom = mMap.targetZoom - mMap.googleMap.getCameraPosition().zoom;
+                zoom = ((float) Math.round(zoom * 10)) / 10;
+                ui.fpOverlay.updateView(faces, (zoom >= 0 ? "+" : "") + String.format("%.1f", zoom), null);
+            } else {
+                long timeRemaining = startDelay - (System.currentTimeMillis() - initTime) / 1000;
+                ui.fpOverlay.updateView(faces, null, Long.toString(timeRemaining));
+            }
+        }
+
         void updateStatus(double latitude, double longitude, float zoom, long time) {
+            long seconds = time / 1000;
+            long minutes = seconds / 60;
+
             latitude  = ((double) Math.round(latitude  * Math.pow(10, 6))) / Math.pow(10, 6);
             longitude = ((double) Math.round(longitude * Math.pow(10, 6))) / Math.pow(10, 6);
             zoom      = ((float)  Math.round(zoom * 10)) / 10;
@@ -254,7 +287,7 @@ public class MapActivity extends Activity {
             mapLat .setText((latitude  >= 0 ? "+" : "") + String.format("%.6f", latitude));
             mapLong.setText((longitude >= 0 ? "+" : "") + String.format("%.6f", longitude));
             mapZoom.setText((zoom      >= 0 ? "+" : "") + String.format("%.1f", zoom));
-            mapTime.setText(String.format("%02d:%02d:%03d", time / 60 / 1000, time / 1000, time % 1000));
+            mapTime.setText(String.format("%02d:%02d:%03d", minutes, seconds, time % 1000));
         }
 
         void onStart() {
@@ -312,9 +345,40 @@ public class MapActivity extends Activity {
             googleMap.addMarker(new MarkerOptions().position(targetPosition));
         }
 
-        void updateMapByFaceTracking(int dX, int dY, float dZ) {
-            googleMap.moveCamera(CameraUpdateFactory.zoomBy(dZ));
-            googleMap.moveCamera(CameraUpdateFactory.scrollBy(dX, dY));
+        void updateMapByFaceTracking(MFaceData face, List<MFaceData> faces, MFaceData initFace) {
+            CameraPosition position = mMap.googleMap.getCameraPosition();
+            Projection projection = googleMap.getProjection();
+            LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
+            
+            Point center = face.getCenter();
+            float diff    = face.getDifference();
+            float minDiff = initFace.getDifference();
+            float maxDiff = ui.mapFragment.getView().getWidth() / 2;
+            
+            if (diff > maxDiff) {
+                diff = maxDiff;
+            } else if (diff < minDiff) {
+                diff = minDiff;
+            }
+
+            float zoomPercent = (diff - minDiff) / (maxDiff - minDiff);
+            float zoom = (config.targetMaxZoom - initZoom) * zoomPercent + initZoom;
+            
+            if (diff == maxDiff) {
+                zoom += 0.01f;
+            } else if (diff == minDiff) {
+                zoom -= 0.01f;
+            }
+
+            if (Math.abs(position.zoom - zoom) < 1.0f) {
+                googleMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
+            }
+            if (!face.approxiEqualFocus(faces.get(faces.size() - 1))) {
+                LatLng latlng = projection.fromScreenLocation(center);
+                if (bounds.contains(latlng)) {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                }
+            }
         }
 
         // Override: Do nothing
@@ -339,21 +403,28 @@ public class MapActivity extends Activity {
             CameraPosition position = mMap.googleMap.getCameraPosition();
             Projection projection   = mMap.googleMap.getProjection();
 
-            long elapsed = System.currentTimeMillis() - initTime;
-            double dLat  = mMap.targetPosition.latitude  - position.target.latitude;
-            double dLong = mMap.targetPosition.longitude - position.target.longitude;
-            float dZoom  = mMap.targetZoom - position.zoom;
-
             Point targetPoint   = projection.toScreenLocation(mMap.targetPosition);
             Point positionPoint = projection.toScreenLocation(position.target);
-            Point dPoint        = new Point(targetPoint.x - positionPoint.x, targetPoint.y - positionPoint.y);
+            LatLng current      = position.target;
+            
+            if (mode == config.FACE_INPUT) {
+                positionPoint = faceMode._face.getCenter();
+                current = projection.fromScreenLocation(positionPoint);
+            }
+            
+            long elapsed = System.currentTimeMillis() - initTime;
+            double dLat  = mMap.targetPosition.latitude  - current.latitude;
+            double dLong = mMap.targetPosition.longitude - current.longitude;
+            float dZoom  = mMap.targetZoom - position.zoom;
+            Point dPoint = new Point(targetPoint.x - positionPoint.x, targetPoint.y - positionPoint.y);
 
             ui.updateStatus(dLat, dLong, dZoom, elapsed);
             if (!demo) {
                 logger.writeRecord(mMap.targetPosition, mMap.targetZoom, position.target, position.zoom, elapsed);
             }
-            if (Math.abs(dZoom) <= 0.1 && Math.abs(dPoint.x) <= 5 && Math.abs(dPoint.y) <= 5) {
+            if (Math.abs(dZoom) <= zoomThreshold && Math.abs(dPoint.x) <= xThreshold && Math.abs(dPoint.y) <= yThreshold) {
                 if (mode == config.FACE_INPUT) {
+                    ui.updateFPOverlay(faceMode.faces);
                     faceMode.stopCamera();
                 }
                 ui.onDone();
@@ -369,24 +440,32 @@ public class MapActivity extends Activity {
     class FaceTrackingMode implements PreviewCallback {
 
         static final int FRONT_CAMERA_INDEX = 1;
-        
+
         Resources res;
         Camera camera;
         FacialProcessing faceProc;
-        FaceData face = null;
-        FaceData lastFace = null;
-        
-        public FaceTrackingMode(Resources resources) {
+        CameraSurfacePreview csPreview;
+        Display    display;
+        DrawView   fpView;
+        FaceData[] faces;
+        List<MFaceData> face = new ArrayList<MFaceData>();
+        MFaceData  initFace;
+        MFaceData  _face;
+
+        FaceTrackingMode(Resources resources) {
             if (!FacialProcessing.isFeatureSupported(FacialProcessing.FEATURE_LIST.FEATURE_FACIAL_PROCESSING)) {
                 throwError("Facial processing is not supported");
             }
             res = resources;
+            display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
             startCamera();
         }
 
         void startCamera() {
             try {
                 camera = Camera.open(FRONT_CAMERA_INDEX);
+                csPreview = new CameraSurfacePreview(MapActivity.this, camera, faceProc);
+                ui.camPreview.addView(csPreview);
                 camera.setPreviewCallback(this);
                 camera.startPreview();
                 if (faceProc == null) {
@@ -402,6 +481,7 @@ public class MapActivity extends Activity {
             if (camera != null) {
                 camera.stopPreview();
                 camera.setPreviewCallback(null);
+                ui.camPreview.removeView(csPreview);
                 camera.release();
                 faceProc.release();
                 faceProc = null;
@@ -409,52 +489,126 @@ public class MapActivity extends Activity {
             camera = null;
         }
 
-        void coolDownPeriod() {
-            if (lastFace == null) {
-                lastFace = face;
-            } else if (initTime + 10 * 1000 <= System.currentTimeMillis()) {
-                startExperiment = true;
-                mMap.addTarget();
-                ringTone();
-            }
-        }
-        
-        void updateMapPosition() {
-            if (face.leftEye == null || face.rightEye == null) { lastFace = null; return; }
-            if (lastFace == null) { lastFace = face; return; }
-            int dX = (face.leftEye.x + face.rightEye.x) / 2 - (lastFace.leftEye.x + lastFace.rightEye.x) / 2;
-            int dY = (face.leftEye.y + face.rightEye.y) / 2 - (lastFace.leftEye.y + lastFace.rightEye.y) / 2;
-            float dZ = (float)(face.rightEye.x - face.leftEye.x) / (float)(lastFace.rightEye.x - lastFace.leftEye.x); 
-            mMap.updateMapByFaceTracking(dX, dY, dZ);
-        }
-
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            Display display  = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-            Size previewSize = camera.getParameters().getPreviewSize();
 
             PREVIEW_ROTATION_ANGLE angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0;
+            Size previewSize  = camera.getParameters().getPreviewSize();
+            int surfaceWidth  = ui.mapFragment.getView().getWidth();
+            int surfaceHeight = ui.mapFragment.getView().getHeight();
+            int displayAngle  = 0;
+
             switch (display.getRotation()) {
-                case 0: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_90; break;
-                case 1: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0; break;
-                case 3: angleEnum = PREVIEW_ROTATION_ANGLE.ROT_180; break;
+                case 0: displayAngle =  90; angleEnum = PREVIEW_ROTATION_ANGLE.ROT_90; break;
+                case 1: displayAngle =   0; angleEnum = PREVIEW_ROTATION_ANGLE.ROT_0; break;
+                case 3: displayAngle = 180; angleEnum = PREVIEW_ROTATION_ANGLE.ROT_180; break;
                 case 2: break; // This case is never reached.
             }
-            
-            faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
-            Log.i(config.LOG_KEY, "FACES: " + faceProc.getNumFaces());
-            if (faceProc.getNumFaces() == 0) {
-                lastFace = null;
-            } else {
-                face = faceProc.getFaceData()[0];
+
+            if(faceProc == null) {
+                faceProc = FacialProcessing.getInstance();
+            }
+
+            if (res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+                camera.setDisplayOrientation(displayAngle);
+            } else if (res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                faceProc.setFrame(data, previewSize.width, previewSize.height, true, angleEnum);
+                camera.setDisplayOrientation(displayAngle);
+            }
+
+            faceProc.normalizeCoordinates(surfaceWidth, surfaceHeight);
+
+            int numFaces = faceProc.getNumFaces();
+            if (numFaces == 0) {
+                ui.updateFPOverlay(null);
                 if (!startExperiment) {
-                    coolDownPeriod();
+                    initTime = System.currentTimeMillis();
+                }
+            } else {
+                faces = faceProc.getFaceData();
+                ui.updateFPOverlay(faces);
+                if (faces == null || faces.length == 0) {
+                    if (!startExperiment) {
+                        initTime = System.currentTimeMillis();
+                    }
                 } else {
-                    updateMapPosition();
+                    _face = new MFaceData(faces[0]);
+                    if (startExperiment) {
+                        if (!face.isEmpty()) {
+                            mMap.updateMapByFaceTracking(_face, face, initFace);
+                        }
+                        face.add(_face);
+                    } else {
+                        if (initFace == null) {
+                            initFace = _face;
+                            initTime = System.currentTimeMillis();
+                        } else if (!initFace.approxiEquals(_face)) {
+                            initFace = _face;
+                            initTime = System.currentTimeMillis();
+                        } else if ((initTime + startDelay * 1000) <= System.currentTimeMillis()) {
+                            initTime = System.currentTimeMillis();
+                            initFace = _face;
+                            face.add(_face);
+                            startExperiment = true;
+                            mMap.addTarget();
+                            ringTone();
+                            timer.run();
+                        }
+                    }
                 }
             }
         }
 
     } // FaceTrackingMode
-    
+
+    class MFaceData {
+
+        final int tolerance = config.faceErrorTolerance;
+
+        int leftEyeX;
+        int leftEyeY;
+        int rightEyeX;
+        int rightEyeY;
+
+        MFaceData(FaceData fd) {
+            if (fd == null) {return;}
+            if (fd.leftEye != null) {
+                leftEyeX = fd.leftEye.x;
+                leftEyeY = fd.leftEye.y;
+            }
+            if (fd.rightEye != null) {
+                rightEyeX = fd.rightEye.x;
+                rightEyeY = fd.rightEye.y;
+            }
+        }
+
+        Point getCenter() {
+            return new Point((leftEyeX + rightEyeX) / 2, (leftEyeY + rightEyeY) / 2);
+        }
+
+        float getDifference() {
+            int x = rightEyeX - leftEyeX;
+            int y = rightEyeY - leftEyeY;
+            
+            return (float) Math.sqrt(x * x + y * y);
+        }
+
+        boolean approxiEquals(FaceData other) {
+            return approxiEquals(new MFaceData(other));
+        }
+        boolean approxiEquals(MFaceData other) {
+            return Math.abs(leftEyeX  - other.leftEyeX)  <= tolerance &&
+                   Math.abs(leftEyeY  - other.leftEyeY)  <= tolerance &&
+                   Math.abs(rightEyeX - other.rightEyeX) <= tolerance &&
+                   Math.abs(rightEyeY - other.rightEyeY) <= tolerance;
+        }
+
+        boolean approxiEqualFocus(MFaceData other) {
+            return Math.abs(getCenter().x - other.getCenter().x) <= tolerance &&
+                   Math.abs(getCenter().y - other.getCenter().y) <= tolerance;
+        }
+
+    } // MFaceData
+
 } // MapActivity
