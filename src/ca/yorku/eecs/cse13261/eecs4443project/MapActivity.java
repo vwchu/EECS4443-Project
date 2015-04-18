@@ -62,6 +62,8 @@ public class MapActivity extends Activity {
         bundle = getIntent().getExtras();
 
         loadBundle();
+        setTitle((demo ? "Demo" : String.format("Trial %d", runID + 1)) + 
+                ": " + config.modeNames[mode]);
 
         mMap   = new Map();
         ui     = new MapActivityUI();
@@ -82,6 +84,7 @@ public class MapActivity extends Activity {
             faceMode      = new FaceTrackingMode(getResources());
 
             ui.crosshair.setVisibility(View.GONE);
+            ui.mapCountDown.setVisibility(View.VISIBLE);
             ui.onStart();
         } else {
             zoomThreshold = config.touchZoomThreshold;
@@ -131,8 +134,18 @@ public class MapActivity extends Activity {
     public void clickDone(View view) {
         if (demo) {
             goToActivity(this, StartActivity.class, null);
+            return;
         }
-        // TODO
+        try { logger.close(); } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        if ((runID + 1) == (trials * order.length)) {
+            goToActivity(this, StartActivity.class, bundle);
+            return;
+        }
+        bundle.putInt(config.RUN_KEY , runID + 1);
+        bundle.putInt(config.MODE_KEY, order[(runID + 1) / trials]);
+        goToActivity(this, MapActivity.class, bundle);
     }
 
     /// HELPER
@@ -141,7 +154,7 @@ public class MapActivity extends Activity {
         demo = bundle.getBoolean (config.DEMO_KEY);
         mode = bundle.getInt     (config.MODE_KEY);
 
-        if (!demo) {
+        if (demo) {
             return;
         }
 
@@ -194,13 +207,13 @@ public class MapActivity extends Activity {
         }
 
         void writeRecord(LatLng target, float targetZoom, LatLng position, float zoom, long millis) {
-            writeRecord(runID + 1, participantCode, groupCode, sessionCode, mode,
-                        target.latitude, target.longitude, targetZoom,
+            writeRecord(runID + 1, participantCode, groupCode, sessionCode, 
+                        config.modes[mode], target.latitude, target.longitude, targetZoom,
                         position.latitude, position.longitude, zoom, millis);
         }
 
         void writeRecord(int    trial          , String participant, String group,
-                         String session        , int    mode       , double targetLatitude,
+                         String session        , String mode       , double targetLatitude,
                          double targetLongitude, float  targetZoom , double latitude,
                          double longitude      , float  zoom       , long   millis)
         {
@@ -216,9 +229,11 @@ public class MapActivity extends Activity {
 
         @Override
         public void close() throws IOException {
+            //Uri uri = Uri.parse("file://" + Environment.getExternalStorageDirectory());
             writer.flush();
             writer.close();
             outStream.close();
+            //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, uri));
         }
 
     } // DataLogger
@@ -229,6 +244,7 @@ public class MapActivity extends Activity {
         TextView     mapLong;
         TextView     mapZoom;
         TextView     mapTime;
+        TextView     mapCountDown;
         LinearLayout mapStatus;
         Button       mapStartBtn;
         Button       mapDoneBtn;
@@ -238,41 +254,45 @@ public class MapActivity extends Activity {
         ImageView    crosshair;
 
         MapActivityUI() {
-            mapLat      = (TextView)     findViewById(R.id.mapLat);
-            mapLong     = (TextView)     findViewById(R.id.mapLong);
-            mapZoom     = (TextView)     findViewById(R.id.mapZoom);
-            mapTime     = (TextView)     findViewById(R.id.mapTime);
-            mapStatus   = (LinearLayout) findViewById(R.id.mapStatus);
-            mapStartBtn = (Button)       findViewById(R.id.mapStartBtn);
-            mapDoneBtn  = (Button)       findViewById(R.id.mapDoneBtn);
-            mapFragment = (MapFragment)  getFragmentManager().findFragmentById(R.id.map);
-            camPreview  = (FrameLayout)  findViewById(R.id.cameraPreview);
-            fpOverlay   = (DrawView)     findViewById(R.id.fpOverlay);
-            crosshair   = (ImageView)    findViewById(R.id.crosshair);
+            mapLat       = (TextView)     findViewById(R.id.mapLat);
+            mapLong      = (TextView)     findViewById(R.id.mapLong);
+            mapZoom      = (TextView)     findViewById(R.id.mapZoom);
+            mapTime      = (TextView)     findViewById(R.id.mapTime);
+            mapCountDown = (TextView)     findViewById(R.id.mapCountDown);
+            mapStatus    = (LinearLayout) findViewById(R.id.mapStatus);
+            mapStartBtn  = (Button)       findViewById(R.id.mapStartBtn);
+            mapDoneBtn   = (Button)       findViewById(R.id.mapDoneBtn);
+            mapFragment  = (MapFragment)  getFragmentManager().findFragmentById(R.id.map);
+            camPreview   = (FrameLayout)  findViewById(R.id.cameraPreview);
+            fpOverlay    = (DrawView)     findViewById(R.id.fpOverlay);
+            crosshair    = (ImageView)    findViewById(R.id.crosshair);
 
             mapFragment.getMapAsync(MapActivity.this.mMap);
-            fullscreen();
-        }
-
-        void fullscreen() {
-            getActionBar().hide();
-            if (Build.VERSION.SDK_INT < 16) {
-                getWindow().setFlags(
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            } else {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-            }
         }
 
         void updateFPOverlay(FaceData[] faces) {
             if (startExperiment) {
-                float zoom = mMap.targetZoom - mMap.googleMap.getCameraPosition().zoom;
+                LatLngBounds bounds = mMap.googleMap.getProjection().getVisibleRegion().latLngBounds;
+                CameraPosition position = mMap.googleMap.getCameraPosition();
+                float zoom = mMap.targetZoom - position.zoom;
+                Point target = new Point(0, 0);
+                
                 zoom = ((float) Math.round(zoom * 10)) / 10;
-                ui.fpOverlay.updateView(faces, (zoom >= 0 ? "+" : "") + String.format("%.1f", zoom), null);
+                if (!bounds.contains(mMap.targetPosition)) {
+                    LatLng targ = mMap.targetPosition; 
+                    LatLng ne   = bounds.northeast;
+                    LatLng sw   = bounds.southwest;
+                    
+                    if (targ.latitude > ne.latitude) { target.y = 1; }
+                    if (targ.latitude < sw.latitude) { target.y = -1; }
+                    if (targ.longitude > ne.longitude) { target.x = 1; }
+                    if (targ.longitude < sw.longitude) { target.x = -1; }
+                }
+                ui.fpOverlay.updateView(faces, (zoom >= 0 ? "+" : "") + String.format("%.1f", zoom), target);
             } else {
                 long timeRemaining = startDelay - (System.currentTimeMillis() - initTime) / 1000;
-                ui.fpOverlay.updateView(faces, null, Long.toString(timeRemaining));
+                ui.mapCountDown.setText(String.format("%d", timeRemaining));
+                ui.fpOverlay.updateView(faces, null, null);
             }
         }
 
@@ -287,7 +307,7 @@ public class MapActivity extends Activity {
             mapLat .setText((latitude  >= 0 ? "+" : "") + String.format("%.6f", latitude));
             mapLong.setText((longitude >= 0 ? "+" : "") + String.format("%.6f", longitude));
             mapZoom.setText((zoom      >= 0 ? "+" : "") + String.format("%.1f", zoom));
-            mapTime.setText(String.format("%02d:%02d:%03d", minutes, seconds, time % 1000));
+            mapTime.setText(String.format("%02d:%02d:%03d", minutes, seconds % 60, time % 1000));
         }
 
         void onStart() {
@@ -304,9 +324,12 @@ public class MapActivity extends Activity {
 
     class Map implements OnMapReadyCallback, OnMarkerClickListener {
 
+        final float RADIANS_TO_DEGREES = 57.2957795f;
+
         GoogleMap googleMap;
         LatLng initPosition;
         LatLng targetPosition;
+        LatLngBounds initBounds;
         float initZoom;
         float targetZoom;
 
@@ -338,6 +361,7 @@ public class MapActivity extends Activity {
             LatLng sw = bounds.southwest;
             LatLng delta = new LatLng(sw.latitude - ne.latitude, sw.longitude - ne.longitude);
 
+            initBounds = bounds;
             targetPosition = new LatLng(
                     ne.latitude  + delta.latitude  * 0.2 + Math.random() * delta.latitude  * 0.6,
                     ne.longitude + delta.longitude * 0.2 + Math.random() * delta.longitude * 0.6);
@@ -346,35 +370,28 @@ public class MapActivity extends Activity {
         }
 
         void updateMapByFaceTracking(MFaceData face, List<MFaceData> faces, MFaceData initFace) {
-            CameraPosition position = mMap.googleMap.getCameraPosition();
-            Projection projection = googleMap.getProjection();
-            LatLngBounds bounds = projection.getVisibleRegion().latLngBounds;
-            
-            Point center = face.getCenter();
+            CameraPosition position   = googleMap.getCameraPosition();
+            Projection     projection = googleMap.getProjection();
+            LatLngBounds   bounds     = projection.getVisibleRegion().latLngBounds;
+            MFaceData      lastFace   = faces.get(faces.size() - 1);
+            Point center  = face.getCenter();
             float diff    = face.getDifference();
             float minDiff = initFace.getDifference();
-            float maxDiff = ui.mapFragment.getView().getWidth() / 2;
-            
-            if (diff > maxDiff) {
-                diff = maxDiff;
-            } else if (diff < minDiff) {
-                diff = minDiff;
-            }
-
+            float maxDiff = minDiff * 1.5f;
+            if (diff > maxDiff) { diff = maxDiff; }
+            if (diff < minDiff) { diff = minDiff; }
             float zoomPercent = (diff - minDiff) / (maxDiff - minDiff);
-            float zoom = (config.targetMaxZoom - initZoom) * zoomPercent + initZoom;
-            
-            if (diff == maxDiff) {
-                zoom += 0.01f;
-            } else if (diff == minDiff) {
-                zoom -= 0.01f;
-            }
-
-            if (Math.abs(position.zoom - zoom) < 1.0f) {
+            float zoom        = (config.targetMaxZoom - initZoom) * zoomPercent + initZoom;
+            if (diff == maxDiff) { zoom += 0.1f; }
+            if (diff == minDiff) { zoom -= 0.1f; }
+            if (Math.abs(position.zoom - zoom) < 1.0f && zoom >= initZoom && zoom <= config.targetMaxZoom) {
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
             }
-            if (!face.approxiEqualFocus(faces.get(faces.size() - 1))) {
-                LatLng latlng = projection.fromScreenLocation(center);
+            if (!face.approxiEqualFocus(lastFace)) {
+                Point newCenter = new Point(center);
+                newCenter.x += face.roll;
+                newCenter.y -= face.pitch * 2;
+                LatLng latlng = projection.fromScreenLocation(newCenter);
                 if (bounds.contains(latlng)) {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
                 }
@@ -395,6 +412,16 @@ public class MapActivity extends Activity {
         @Override public void onTick(long millisUntilFinished) {} // Nothing to do
         @Override public void onFinish() { run(); }
 
+        void stopTrial() {
+            if (mode == config.FACE_INPUT) {
+                ui.updateFPOverlay(faceMode.faces);
+                faceMode.stopCamera();
+            }
+            ui.onDone();
+            ringTone();
+            cancel();
+        }
+        
         @Override
         public void run() {
             if (!startExperiment) {
@@ -407,8 +434,8 @@ public class MapActivity extends Activity {
             Point positionPoint = projection.toScreenLocation(position.target);
             LatLng current      = position.target;
             
-            if (mode == config.FACE_INPUT) {
-                positionPoint = faceMode._face.getCenter();
+            if (mode == config.FACE_INPUT && !faceMode.noFace) {
+                positionPoint = faceMode.face.getCenter();
                 current = projection.fromScreenLocation(positionPoint);
             }
             
@@ -423,13 +450,10 @@ public class MapActivity extends Activity {
                 logger.writeRecord(mMap.targetPosition, mMap.targetZoom, position.target, position.zoom, elapsed);
             }
             if (Math.abs(dZoom) <= zoomThreshold && Math.abs(dPoint.x) <= xThreshold && Math.abs(dPoint.y) <= yThreshold) {
-                if (mode == config.FACE_INPUT) {
-                    ui.updateFPOverlay(faceMode.faces);
-                    faceMode.stopCamera();
-                }
-                ui.onDone();
-                ringTone();
-                cancel();
+                stopTrial();
+            } else if (initTime + config.trialTimeLimit * 60 * 1000 <= System.currentTimeMillis()) {
+                ui.mapDoneBtn.setText("Timed Out");
+                stopTrial();
             } else {
                 start();
             }
@@ -448,9 +472,10 @@ public class MapActivity extends Activity {
         Display    display;
         DrawView   fpView;
         FaceData[] faces;
-        List<MFaceData> face = new ArrayList<MFaceData>();
+        List<MFaceData> fList = new ArrayList<MFaceData>();
         MFaceData  initFace;
-        MFaceData  _face;
+        MFaceData  face;
+        boolean    noFace = true;
 
         FaceTrackingMode(Resources resources) {
             if (!FacialProcessing.isFeatureSupported(FacialProcessing.FEATURE_LIST.FEATURE_FACIAL_PROCESSING)) {
@@ -525,6 +550,7 @@ public class MapActivity extends Activity {
                 if (!startExperiment) {
                     initTime = System.currentTimeMillis();
                 }
+                noFace = true;
             } else {
                 faces = faceProc.getFaceData();
                 ui.updateFPOverlay(faces);
@@ -532,25 +558,31 @@ public class MapActivity extends Activity {
                     if (!startExperiment) {
                         initTime = System.currentTimeMillis();
                     }
+                    noFace = true;
                 } else {
-                    _face = new MFaceData(faces[0]);
+                    face = new MFaceData(faces[0]);
                     if (startExperiment) {
-                        if (!face.isEmpty()) {
-                            mMap.updateMapByFaceTracking(_face, face, initFace);
+                        if (noFace) {
+                            fList.clear();
+                        } else if (!fList.isEmpty()) {
+                            mMap.updateMapByFaceTracking(face, fList, initFace);
                         }
-                        face.add(_face);
+                        fList.add(face);
+                        noFace = false;
                     } else {
+                        noFace = false;
                         if (initFace == null) {
-                            initFace = _face;
+                            initFace = face;
                             initTime = System.currentTimeMillis();
-                        } else if (!initFace.approxiEquals(_face)) {
-                            initFace = _face;
+                        } else if (!initFace.approxiEquals(face)) {
+                            initFace = face;
                             initTime = System.currentTimeMillis();
                         } else if ((initTime + startDelay * 1000) <= System.currentTimeMillis()) {
                             initTime = System.currentTimeMillis();
-                            initFace = _face;
-                            face.add(_face);
+                            initFace = face;
+                            fList.add(face);
                             startExperiment = true;
+                            ui.mapCountDown.setVisibility(View.GONE);
                             mMap.addTarget();
                             ringTone();
                             timer.run();
@@ -570,6 +602,8 @@ public class MapActivity extends Activity {
         int leftEyeY;
         int rightEyeX;
         int rightEyeY;
+        int pitch;
+        int roll;
 
         MFaceData(FaceData fd) {
             if (fd == null) {return;}
@@ -581,12 +615,18 @@ public class MapActivity extends Activity {
                 rightEyeX = fd.rightEye.x;
                 rightEyeY = fd.rightEye.y;
             }
+            pitch = fd.getPitch();
+            roll  = fd.getRoll();
         }
 
         Point getCenter() {
             return new Point((leftEyeX + rightEyeX) / 2, (leftEyeY + rightEyeY) / 2);
         }
 
+        Point getDelta() {
+            return new Point(rightEyeX - leftEyeX, rightEyeY - leftEyeY);
+        }
+        
         float getDifference() {
             int x = rightEyeX - leftEyeX;
             int y = rightEyeY - leftEyeY;
@@ -605,8 +645,11 @@ public class MapActivity extends Activity {
         }
 
         boolean approxiEqualFocus(MFaceData other) {
-            return Math.abs(getCenter().x - other.getCenter().x) <= tolerance &&
-                   Math.abs(getCenter().y - other.getCenter().y) <= tolerance;
+            return approxiEqualFocus(other.getCenter());
+        }
+        boolean approxiEqualFocus(Point pt) {
+            return Math.abs(getCenter().x - pt.x) <= tolerance &&
+                   Math.abs(getCenter().y - pt.y) <= tolerance;
         }
 
     } // MFaceData

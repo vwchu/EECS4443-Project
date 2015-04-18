@@ -18,8 +18,7 @@
 <resources>
 
     <item type="integer" name="constTouchModeID">0</item>
-    <item type="integer" name="constAccelModeID">1</item>
-    <item type="integer" name="constFaceModeID">2</item>
+    <item type="integer" name="constFaceModeID">1</item>
 
     <string name="constKeyDemo">demo</string>
     <string name="constKeyMode">mode</string>
@@ -36,7 +35,7 @@
     <string name="dataFilenameFormat">Data-%1$s-%2$s-%3$s.csv</string><!-- P01, G01, S01 -->
 
     <item type="integer" name="configParticipants">12</item>
-    <item type="integer" name="configGroups">3</item>
+    <item type="integer" name="configGroups">2</item>
     <item type="integer" name="configTrials">10</item>
 
     <string name="configParticipantFormat">P%02d</string>
@@ -45,8 +44,8 @@
     <string name="configTrialFormat">%d</string>
     
     <string name="touchZoomThreshold">0.1</string>
-    <integer name="touchXThreshold">5</integer>
-    <integer name="touchYThreshold">5</integer>
+    <integer name="touchXThreshold">10</integer>
+    <integer name="touchYThreshold">10</integer>
     <integer name="touchStartDelay">0</integer>
 
     <string name="faceZoomThreshold">0.5</string>
@@ -54,6 +53,7 @@
     <integer name="faceYThreshold">100</integer>
     <integer name="faceStartDelay">5</integer>
     <integer name="faceErrorTolerance">20</integer>
+    <integer name="trialTimeLimit">5</integer>
 
     <string-array name="configModes">
         <item>TOUCH</item>

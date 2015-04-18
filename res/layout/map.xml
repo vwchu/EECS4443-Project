@@ -37,8 +37,19 @@
 	        android:layout_gravity="center"
 	        android:contentDescription="@string/map_crosshair"
 	        android:src="@drawable/crosshair" />
-	</FrameLayout>
+	    
+	    <TextView 
+            android:id="@+id/mapCountDown"
+            android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+            android:textSize="200sp"
+            android:textStyle="bold"
+            android:textColor="#80ff0000"
+            android:visibility="gone" />
 
+	</FrameLayout>
+    
     <LinearLayout
         android:layout_width="fill_parent"
 	    android:layout_height="80dp"

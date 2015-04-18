@@ -37,6 +37,7 @@ class AppConfig {
     int      faceYThreshold;
     int      faceStartDelay;
     int      faceErrorTolerance;
+    int      trialTimeLimit;
 
     // Constants
     final String APP;
@@ -103,6 +104,7 @@ class AppConfig {
         faceYThreshold     = r.getInteger(R.integer.faceYThreshold);
         faceStartDelay     = r.getInteger(R.integer.faceStartDelay);
         faceErrorTolerance = r.getInteger(R.integer.faceErrorTolerance);
+        trialTimeLimit     = r.getInteger(R.integer.trialTimeLimit);
 
         modesMap   = new HashMap<String, String>();
         modesIndex = new HashMap<String, Integer>();
