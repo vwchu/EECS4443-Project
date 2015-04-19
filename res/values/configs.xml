@@ -17,11 +17,16 @@
 
 <resources>
 
+    <string name="app_name">EECS 4443 Project</string>
+    <string name="author_email">vwchu@my.yorku.ca</string>
+    <string name="survey_url">http://1drv.ms/1yF32xZ</string>    
+    
     <item type="integer" name="constTouchModeID">0</item>
     <item type="integer" name="constFaceModeID">1</item>
 
     <string name="constKeyDemo">demo</string>
     <string name="constKeyMode">mode</string>
+    <string name="constKeyInitials">userInitials</string>
     <string name="constKeyParticipant">participantCode</string>
     <string name="constKeyGroup">groupCode</string>
     <string name="constKeySession">sessionCode</string>
@@ -42,7 +47,7 @@
     <string name="configGroupFormat">G%02d</string>
     <string name="configSessionFormat">S%02d</string>
     <string name="configTrialFormat">%d</string>
-    
+
     <string name="touchZoomThreshold">0.1</string>
     <integer name="touchXThreshold">10</integer>
     <integer name="touchYThreshold">10</integer>

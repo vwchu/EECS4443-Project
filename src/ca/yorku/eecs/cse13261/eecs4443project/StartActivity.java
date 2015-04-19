@@ -1,8 +1,11 @@
 package ca.yorku.eecs.cse13261.eecs4443project;
 
+import java.io.*;
 import android.app.*;
+import android.content.*;
 import android.os.*;
 import android.view.*;
+import android.widget.*;
 import static ca.yorku.eecs.cse13261.eecs4443project.Utils.*;
 import static ca.yorku.eecs.cse13261.eecs4443project.AppConfig.*;
 
@@ -53,6 +56,44 @@ public class StartActivity extends Activity {
         clickDemo(view, config.FACE_INPUT);
     }
 
+    /**
+     * Called when the "Cleanup Data" button
+     * is pressed. Deletes all data files.
+     */
+    public void clickCleanupData(View view) {
+        (new DialogFragment() {
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                return (new AlertDialog.Builder(getActivity()))
+                        .setMessage(R.string.start_clean_message)
+                        .setPositiveButton(R.string.start_clean_ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                File directory = new File(Environment.getExternalStorageDirectory() + config.dataDirectory);
+                                for (File file : directory.listFiles()) {
+                                    file.delete();
+                                }
+                                Toast.makeText(StartActivity.this, directory.delete() 
+                                        ? config.dataDirectory + " has been deleted."
+                                        : config.dataDirectory + " could not be deleted.", 
+                                    Toast.LENGTH_LONG).show();
+                            }})
+                        .setNegativeButton(R.string.start_clean_cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                return;
+                            }})
+                        .create();
+            }
+        }).show(getFragmentManager(), "DeleteAlertDialogFragment");
+    }
+
+    /**
+     * Called when the "Instructions" or "Help" button
+     * is pressed. Shows the help page.
+     */
+    public void clickHelp(View view) {
+        goToActivity(this, HelpActivity.class, null);
+    }
+    
     /**
      * Called when the "Exit" button is pressed.
      * Stops the application.

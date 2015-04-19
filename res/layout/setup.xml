@@ -35,6 +35,23 @@
 					   	android:textSize="30sp" />
 				</TableRow>
 			    
+			    <TableRow android:gravity="center_vertical">
+	                <TextView 
+	                    android:gravity="end"
+			            android:paddingLeft="5dp"
+			            android:paddingRight="5dp"
+			            android:text="@string/setup_part"
+			            android:textAppearance="?android:attr/textAppearanceMedium"
+			            android:labelFor="@+id/setupUserInitials" />
+	                <EditText
+	                    android:id="@id/setupUserInitials"
+	                    android:layout_weight="1"
+	                    android:gravity="start"
+	                    android:singleLine="true"
+	                    android:inputType="text" >	                    
+	                </EditText>
+	            </TableRow>
+			    
 	            <TableRow android:gravity="center_vertical">
 	                <TextView 
 	                    android:gravity="end"

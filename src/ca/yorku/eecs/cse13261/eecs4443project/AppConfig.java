@@ -41,11 +41,13 @@ class AppConfig {
 
     // Constants
     final String APP;
+    final String EMAIL;
     final String LOG_KEY;
     final int    TOUCH_INPUT;
     final int    FACE_INPUT;
     final String DEMO_KEY;
     final String MODE_KEY;
+    final String INITIALS_KEY;
     final String PARTICIPANT_KEY;
     final String GROUP_KEY;
     final String SESSION_KEY;
@@ -58,11 +60,13 @@ class AppConfig {
     private AppConfig(Resources r) {
 
         APP                = r.getString(R.string.app_name);
+        EMAIL              = r.getString(R.string.author_email);
         LOG_KEY            = r.getString(R.string.app_name);
         TOUCH_INPUT        = r.getInteger(R.integer.constTouchModeID);
         FACE_INPUT         = r.getInteger(R.integer.constFaceModeID);
         DEMO_KEY           = r.getString(R.string.constKeyDemo);
         MODE_KEY           = r.getString(R.string.constKeyMode);
+        INITIALS_KEY       = r.getString(R.string.constKeyInitials);
         PARTICIPANT_KEY    = r.getString(R.string.constKeyParticipant);
         GROUP_KEY          = r.getString(R.string.constKeyGroup);
         SESSION_KEY        = r.getString(R.string.constKeySession);

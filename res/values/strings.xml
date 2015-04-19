@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">EECS 4443 Project</string>
-
     <!-- Map -->
     <string name="map_btn_start">Start</string>
     <string name="map_btn_done">Finish</string>
@@ -11,7 +9,6 @@
     <string name="map_label_long">Longitude</string>
     <string name="map_label_zoom">Zoom</string>
     <string name="map_label_time">Time</string>
-    
     <string name="map_default_value">--</string>
     <string name="map_default_time">--:--:---</string>
 
@@ -20,7 +17,12 @@
     <string name="start_run_experiment">Run Experiment</string>
     <string name="start_demo_touch">Demo Touch</string>
     <string name="start_demo_face">Demo Facial Tracking</string>
+    <string name="start_help">Instructions</string>
+    <string name="start_cleanup_data">Cleanup Data</string>
     <string name="start_exit">Exit</string>
+    <string name="start_clean_message">Delete data directory and all its content?</string>
+    <string name="start_clean_ok">Yes</string>
+    <string name="start_clean_cancel">No</string>
 
     <!-- Setup -->
     <string name="setup_title">Setup</string>
@@ -35,5 +37,79 @@
     <string name="setup_logging_title">Logging</string>
     <string name="setup_logging_data_directory">Data directory:</string>
     <string name="setup_logging_data_file">Data output file:</string>
+
+    <!-- Results -->
+    <string name="results_title">Results</string>
+    <string name="results_thanks">Thank You</string>
+    <string name="results_btn_email">Email</string>
+    <string name="results_btn_exit">Exit</string>
+    <string name="results_text_1">
+        You have completed the user study.
+        Tap the Email button below to send the data file created.
+        If it is not possible, email the file at:	</string>
+    <string name="results_text_2">to:</string>
+    <string name="results_text_3">
+        Do not delete any created data files until after
+        you have received confirmation from the author.	</string>
+    <string name="results_text_4">
+        Please also complete the survey regarding your user feedback
+        for this experiment at the following URL:	</string>
+    
+    <!-- Help -->
+    <string name="help_title">Help</string>
+	<string name="help_btn_exit">Exit</string>
+    <string name="help_text_1">
+        This application is intended for a user study to
+        examine the differences between touch-based input and
+        facial-tracking. 
+    </string>
+    <string name="help_text_2">    
+        The test will occur in a quiet room with favourable lighting
+        conditions where the participants will be seated at a table.
+        The Experiment mode will run a certain number of trials (default
+        of 5) with one input method and then the same number of trials
+        with the other method. In each trial, a random point on the
+        map is selected (marked by the pin). The marker will always be
+        placed in the field of view at the start of each trial.
+    </string>
+    <string name="help_text_3">
+        In touch mode, the user must press the Start button to
+        begin. To goal is to center the pin, while zooming until
+        the indicated zoom difference is 0.0 (in the status bar).
+        A crosshair will be provided to help the user center the marker.
+        The user may pan the map by swiping left, right, up and down with
+        one finger, and zoom in and out with two-finger pitch. Please do
+        not use the double tap gesture to focus and zoom.
+    </string>
+    <string name="help_text_4">
+        For the facial tracking mode, participants will be instructed
+        to keep their hands and forearms on the table to ensure that
+        the device does not move. The device will be tilted back slightly
+        such that the participant\'s face is centered in the camera\'s field
+        of view. User\'s face should be a distance of about 30 cm away from
+        the screen to start. The user must remain still for 5 seconds before
+        each trial begins. Moving one\'s head toward and away from the screen
+        will zoom in and out respectively. Moving one\'s head side-to-side or
+        tilting one\'s head left and right will pan the map west and east
+        respectively. And Moving one\'s head up and down or tilting one\'s 
+        head up and down will pan the map north and south respectively. An
+        indicator, will display the preceived location of the left and right
+        eyes, the zoom difference as well as the direction to the target when
+        outside of the field of view. Zoom difference of +/- 0.5 is acceptable.
+        Centering is based on the focus between the eyes or the center of the
+        screen.
+    </string>
+    <string name="help_text_5">
+    	A status bar at the bottom of the screen will indicate the
+        difference in latitude, longitude and zoom from the desired target
+        as well as the time elapsed. You will hear an audio tone to start and
+        when you finish. Each trial is run for a maximum of 5 minutes, at which
+        time the trial will time out. Press the "Finish" or "Timed Out" button
+        to continue to the next trial.
+    </string>
+    <string name="help_text_6">
+    	For a demonstration, try the Demo Touch or Demo Facial Tracking modes.
+    	For further clarification, feel free to email: 
+    </string>
 
 </resources>

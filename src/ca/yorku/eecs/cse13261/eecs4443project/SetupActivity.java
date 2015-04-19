@@ -1,6 +1,7 @@
 package ca.yorku.eecs.cse13261.eecs4443project;
 
 import java.io.*;
+import java.util.Locale;
 import android.app.*;
 import android.content.*;
 import android.os.*;
@@ -36,6 +37,11 @@ public class SetupActivity extends Activity {
         ui = new SetupActivityUI();
         bundle = new Bundle();
     }
+    
+    @Override
+    public void onBackPressed() {
+        clickExit(null);
+    }
 
     /// CLICK CALLBACKS
     
@@ -60,6 +66,7 @@ public class SetupActivity extends Activity {
 
     void updateBundle() {
         bundle.putBoolean (config.DEMO_KEY, false);
+        bundle.putString  (config.INITIALS_KEY, ui.setupUserInitials.getText().toString().toUpperCase(Locale.CANADA));
         bundle.putString  (config.PARTICIPANT_KEY, ui.getSpinnerValue(ui.setupParticipants));
         bundle.putString  (config.GROUP_KEY, ui.getSpinnerValue(ui.setupGroups));
         bundle.putString  (config.SESSION_KEY, bundle.getString(__SESSION__));
@@ -74,6 +81,7 @@ public class SetupActivity extends Activity {
     void saveSettings() {
         SharedPreferences settings = getSharedPreferences(config.APP, Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
+        editor.putString(config.INITIALS_KEY   , ui.setupUserInitials.getText().toString().toUpperCase(Locale.CANADA));
         editor.putString(config.PARTICIPANT_KEY, ui.getSpinnerValue(ui.setupParticipants));
         editor.putString(config.GROUP_KEY      , ui.getSpinnerValue(ui.setupGroups));
         editor.putString(config.TRIALS_KEY     , ui.getSpinnerValue(ui.setupTrials));
@@ -132,6 +140,7 @@ public class SetupActivity extends Activity {
     
     class SetupActivityUI implements OnItemSelectedListener {
         
+        EditText setupUserInitials;
         Spinner  setupParticipants;
         Spinner  setupGroups;
         Spinner  setupTrials;
@@ -140,6 +149,7 @@ public class SetupActivity extends Activity {
         TextView setupDataFile;        
         
         SetupActivityUI() {
+            setupUserInitials  = (EditText) findViewById(R.id.setupUserInitials);
             setupParticipants  = (Spinner)  findViewById(R.id.setupParticipant);
             setupGroups        = (Spinner)  findViewById(R.id.setupGroup);
             setupTrials        = (Spinner)  findViewById(R.id.setupTrials);
@@ -162,16 +172,19 @@ public class SetupActivity extends Activity {
 
         void setDefaults(boolean reset) {
             SharedPreferences settings = getSharedPreferences(config.APP, Activity.MODE_PRIVATE);
+            String defaultUserInitials = "";
             String defaultParticipant  = config.defaultParticipant;
             String defaultGroup        = config.defaultGroup;
             String defaultTrial        = config.defaultTrial;
             
             if (!reset) {
-                defaultParticipant = settings.getString(config.PARTICIPANT_KEY, defaultParticipant);
-                defaultGroup       = settings.getString(config.GROUP_KEY      , defaultGroup);
-                defaultTrial       = settings.getString(config.TRIALS_KEY     , defaultTrial);
+                defaultUserInitials = settings.getString(config.INITIALS_KEY   , defaultUserInitials);
+                defaultParticipant  = settings.getString(config.PARTICIPANT_KEY, defaultParticipant);
+                defaultGroup        = settings.getString(config.GROUP_KEY      , defaultGroup);
+                defaultTrial        = settings.getString(config.TRIALS_KEY     , defaultTrial);
             }
 
+            setupUserInitials.setText(defaultUserInitials);
             setSpinner(setupParticipants, defaultParticipant);
             setSpinner(setupGroups, defaultGroup);
             setSpinner(setupTrials, defaultTrial);

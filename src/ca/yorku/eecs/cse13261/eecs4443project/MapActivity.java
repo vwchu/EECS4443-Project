@@ -39,6 +39,7 @@ public class MapActivity extends Activity {
 
     boolean demo;
     int     mode;
+    String  userInitials;
     String  participantCode;
     String  groupCode;
     String  sessionCode;
@@ -95,6 +96,11 @@ public class MapActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+    
+    @Override
     protected void onPause() {
         super.onPause();
         if (mode == config.FACE_INPUT) {
@@ -134,18 +140,18 @@ public class MapActivity extends Activity {
     public void clickDone(View view) {
         if (demo) {
             goToActivity(this, StartActivity.class, null);
-            return;
+        } else {
+            try { logger.close(); } catch (Exception e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            if ((runID + 1) == (trials * order.length)) {
+                goToActivity(this, ResultsActivity.class, bundle);
+            } else {
+                bundle.putInt(config.RUN_KEY , runID + 1);
+                bundle.putInt(config.MODE_KEY, order[(runID + 1) / trials]);
+                goToActivity(this, MapActivity.class, bundle);
+            }
         }
-        try { logger.close(); } catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        if ((runID + 1) == (trials * order.length)) {
-            goToActivity(this, StartActivity.class, bundle);
-            return;
-        }
-        bundle.putInt(config.RUN_KEY , runID + 1);
-        bundle.putInt(config.MODE_KEY, order[(runID + 1) / trials]);
-        goToActivity(this, MapActivity.class, bundle);
     }
 
     /// HELPER
@@ -158,6 +164,7 @@ public class MapActivity extends Activity {
             return;
         }
 
+        userInitials    = bundle.getString  (config.INITIALS_KEY);
         participantCode = bundle.getString  (config.PARTICIPANT_KEY);
         groupCode       = bundle.getString  (config.GROUP_KEY);
         sessionCode     = bundle.getString  (config.SESSION_KEY);
@@ -200,27 +207,30 @@ public class MapActivity extends Activity {
         }
 
         void writeHeader() {
-            write("trial"          , "participant", "group",
-                  "session"        , "mode"       , "targetLatitude",
-                  "targetLongitude", "targetZoom" , "latitude",
-                  "longitude"      , "zoom"       , "millis");
+            write("trial"          , "userInitials"   , "participant", 
+                  "group"          , "session"        , "mode"       ,
+                  "targetLatitude" , "targetLongitude", "targetZoom" ,
+                  "latitude"       , "longitude"      , "zoom"       ,
+                  "millis");
         }
 
         void writeRecord(LatLng target, float targetZoom, LatLng position, float zoom, long millis) {
-            writeRecord(runID + 1, participantCode, groupCode, sessionCode, 
+            writeRecord(runID + 1, userInitials, participantCode, groupCode, sessionCode, 
                         config.modes[mode], target.latitude, target.longitude, targetZoom,
                         position.latitude, position.longitude, zoom, millis);
         }
 
-        void writeRecord(int    trial          , String participant, String group,
-                         String session        , String mode       , double targetLatitude,
-                         double targetLongitude, float  targetZoom , double latitude,
-                         double longitude      , float  zoom       , long   millis)
+        void writeRecord(int    trial          , String userInitials   , String participant, 
+                         String group          , String session        , String mode,
+                         double targetLatitude , double targetLongitude, float  targetZoom,
+                         double latitude       , double longitude      , float  zoom,
+                         long   millis)
         {
-            write(trial          , participant, group,
-                  session        , mode       , targetLatitude,
-                  targetLongitude, targetZoom , latitude,
-                  longitude      , zoom       , millis);
+            write(trial          , userInitials   , participant,
+                  group          , session        , mode,
+                  targetLatitude , targetLongitude, targetZoom,
+                  latitude       , longitude      , zoom,
+                  millis);
         }
 
         public void write(Object... elements) {
@@ -229,11 +239,9 @@ public class MapActivity extends Activity {
 
         @Override
         public void close() throws IOException {
-            //Uri uri = Uri.parse("file://" + Environment.getExternalStorageDirectory());
             writer.flush();
             writer.close();
             outStream.close();
-            //sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, uri));
         }
 
     } // DataLogger
@@ -412,7 +420,7 @@ public class MapActivity extends Activity {
         @Override public void onTick(long millisUntilFinished) {} // Nothing to do
         @Override public void onFinish() { run(); }
 
-        void stopTrial() {
+        void stopTrial(long time, boolean finish) {
             if (mode == config.FACE_INPUT) {
                 ui.updateFPOverlay(faceMode.faces);
                 faceMode.stopCamera();
@@ -421,7 +429,7 @@ public class MapActivity extends Activity {
             ringTone();
             cancel();
         }
-        
+
         @Override
         public void run() {
             if (!startExperiment) {
@@ -450,10 +458,10 @@ public class MapActivity extends Activity {
                 logger.writeRecord(mMap.targetPosition, mMap.targetZoom, position.target, position.zoom, elapsed);
             }
             if (Math.abs(dZoom) <= zoomThreshold && Math.abs(dPoint.x) <= xThreshold && Math.abs(dPoint.y) <= yThreshold) {
-                stopTrial();
-            } else if (initTime + config.trialTimeLimit * 60 * 1000 <= System.currentTimeMillis()) {
+                stopTrial(elapsed, true);
+            } else if (config.trialTimeLimit * 60 * 1000 <= elapsed) {
                 ui.mapDoneBtn.setText("Timed Out");
-                stopTrial();
+                stopTrial(elapsed, false);
             } else {
                 start();
             }
