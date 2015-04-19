@@ -28,7 +28,7 @@ public class ResultsActivity extends Activity {
         bundle = getIntent().getExtras();
         
         loadBundle();
-        ((TextView)findViewById(R.id.resultsFile)).setText(dataDirectory + "/" + dataFile);
+        ((TextView)findViewById(R.id.resultsFile)).setText(config.dataDirectory + "/" + dataFile);
         //((TextView)findViewById(R.id.resultsEmail)).setText("mailto:" + config.EMAIL);
     }
 

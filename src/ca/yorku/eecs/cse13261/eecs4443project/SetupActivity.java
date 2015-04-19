@@ -47,6 +47,7 @@ public class SetupActivity extends Activity {
     
     public void clickOK(View view) {
         updateBundle();
+        saveSettings();
         createDataFile();
         goToActivity(this, MapActivity.class, bundle);
     }
