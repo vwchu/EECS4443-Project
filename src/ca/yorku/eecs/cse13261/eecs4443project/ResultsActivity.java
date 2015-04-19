@@ -15,6 +15,7 @@ public class ResultsActivity extends Activity {
     Bundle bundle;
     
     String userInitials;
+    String participantCode;
     String dataDirectory;
     String dataFile;
     
@@ -44,8 +45,8 @@ public class ResultsActivity extends Activity {
 
     public void clickEmail(View view) {
         Uri file = Uri.parse("file://" + dataDirectory + "/" + dataFile);
-        String subject = "EECS 4443 Experiment data from " + userInitials;
-        Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+        String subject = String.format("EECS 4443 Project [%s, %s]", participantCode, userInitials);
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         emailIntent.putExtra(Intent.EXTRA_EMAIL, config.EMAIL);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
@@ -58,6 +59,7 @@ public class ResultsActivity extends Activity {
     
     void loadBundle() {
         userInitials    = bundle.getString  (config.INITIALS_KEY);
+        participantCode = bundle.getString  (config.PARTICIPANT_KEY);
         dataDirectory   = bundle.getString  (config.DATADIR_KEY);
         dataFile        = bundle.getString  (config.DATAFILE_KEY);
     }

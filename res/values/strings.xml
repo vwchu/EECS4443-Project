@@ -46,7 +46,7 @@
     <string name="results_text_1">
         You have completed the user study.
         Tap the Email button below to send the data file created.
-        If it is not possible, email the file at:	</string>
+        If fails or not possible, email the file at:	</string>
     <string name="results_text_2">to:</string>
     <string name="results_text_3">
         Do not delete any created data files until after
@@ -54,7 +54,7 @@
     <string name="results_text_4">
         Please also complete the survey regarding your user feedback
         for this experiment at the following URL:	</string>
-    
+
     <!-- Help -->
     <string name="help_title">Help</string>
 	<string name="help_btn_exit">Exit</string>
