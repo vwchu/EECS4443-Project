@@ -390,8 +390,8 @@ public class MapActivity extends Activity {
             if (diff < minDiff) { diff = minDiff; }
             float zoomPercent = (diff - minDiff) / (maxDiff - minDiff);
             float zoom        = (config.targetMaxZoom - initZoom) * zoomPercent + initZoom;
-            if (diff == maxDiff) { zoom += 0.1f; }
-            if (diff == minDiff) { zoom -= 0.1f; }
+            if (diff == maxDiff) { zoom = position.zoom + 0.1f; }
+            if (diff == minDiff) { zoom = position.zoom - 0.1f; }
             if (Math.abs(position.zoom - zoom) < 1.0f && zoom >= initZoom && zoom <= config.targetMaxZoom) {
                 googleMap.moveCamera(CameraUpdateFactory.zoomTo(zoom));
             }

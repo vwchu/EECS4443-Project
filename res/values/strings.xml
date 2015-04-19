@@ -30,6 +30,7 @@
     <string name="setup_btn_ok">OK</string>
     <string name="setup_btn_reset">Reset</string>
     <string name="setup_btn_exit">Exit</string>
+    <string name="setup_user_initials">User initials:</string>
     <string name="setup_part">Participant code:</string>
     <string name="setup_group">Group code:</string>
     <string name="setup_trials">Number of trials per mode:</string>
@@ -77,9 +78,11 @@
         begin. To goal is to center the pin, while zooming until
         the indicated zoom difference is 0.0 (in the status bar).
         A crosshair will be provided to help the user center the marker.
-        The user may pan the map by swiping left, right, up and down with
-        one finger, and zoom in and out with two-finger pitch. Please do
-        not use the double tap gesture to focus and zoom.
+        The crosshair should be centered at the bottom tip of the pin, 
+        not the center of the pin. The user may pan the map by swiping 
+        left, right, up and down with one finger, and zoom in and out
+        with two-finger pitch. Please do not use the double tap gesture
+        to focus and zoom.
     </string>
     <string name="help_text_4">
         For the facial tracking mode, participants will be instructed

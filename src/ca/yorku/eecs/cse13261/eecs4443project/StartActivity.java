@@ -65,16 +65,21 @@ public class StartActivity extends Activity {
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 return (new AlertDialog.Builder(getActivity()))
+                        .setTitle(R.string.start_cleanup_data)
                         .setMessage(R.string.start_clean_message)
                         .setPositiveButton(R.string.start_clean_ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                boolean success = false;
                                 File directory = new File(Environment.getExternalStorageDirectory() + config.dataDirectory);
-                                for (File file : directory.listFiles()) {
-                                    file.delete();
+                                if (directory.exists()) {
+                                    for (File file : directory.listFiles()) {
+                                        file.delete();
+                                    }
+                                    success = directory.delete();
                                 }
-                                Toast.makeText(StartActivity.this, directory.delete() 
-                                        ? config.dataDirectory + " has been deleted."
-                                        : config.dataDirectory + " could not be deleted.", 
+                                Toast.makeText(StartActivity.this,
+                                    success ? config.dataDirectory + " has been deleted."
+                                            : config.dataDirectory + " could not be deleted.", 
                                     Toast.LENGTH_LONG).show();
                             }})
                         .setNegativeButton(R.string.start_clean_cancel, new DialogInterface.OnClickListener() {
