@@ -63,7 +63,7 @@ public class MapActivity extends Activity {
         bundle = getIntent().getExtras();
 
         loadBundle();
-        setTitle((demo ? "Demo" : String.format("Trial %d", runID + 1)) + 
+        setTitle((demo ? "Demo" : String.format("Trial %d", runID + 1)) +
                 ": " + config.modeNames[mode]);
 
         mMap   = new Map();
@@ -99,7 +99,7 @@ public class MapActivity extends Activity {
     public void onBackPressed() {
         // do nothing
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -207,7 +207,7 @@ public class MapActivity extends Activity {
         }
 
         void writeHeader() {
-            write("trial"          , "userInitials"   , "participant", 
+            write("trial"          , "userInitials"   , "participant",
                   "group"          , "session"        , "mode"       ,
                   "targetLatitude" , "targetLongitude", "targetZoom" ,
                   "latitude"       , "longitude"      , "zoom"       ,
@@ -215,12 +215,12 @@ public class MapActivity extends Activity {
         }
 
         void writeRecord(LatLng target, float targetZoom, LatLng position, float zoom, long millis) {
-            writeRecord(runID + 1, userInitials, participantCode, groupCode, sessionCode, 
+            writeRecord(runID + 1, userInitials, participantCode, groupCode, sessionCode,
                         config.modes[mode], target.latitude, target.longitude, targetZoom,
                         position.latitude, position.longitude, zoom, millis);
         }
 
-        void writeRecord(int    trial          , String userInitials   , String participant, 
+        void writeRecord(int    trial          , String userInitials   , String participant,
                          String group          , String session        , String mode,
                          double targetLatitude , double targetLongitude, float  targetZoom,
                          double latitude       , double longitude      , float  zoom,
@@ -284,13 +284,13 @@ public class MapActivity extends Activity {
                 CameraPosition position = mMap.googleMap.getCameraPosition();
                 float zoom = mMap.targetZoom - position.zoom;
                 Point target = new Point(0, 0);
-                
+
                 zoom = ((float) Math.round(zoom * 10)) / 10;
                 if (!bounds.contains(mMap.targetPosition)) {
-                    LatLng targ = mMap.targetPosition; 
+                    LatLng targ = mMap.targetPosition;
                     LatLng ne   = bounds.northeast;
                     LatLng sw   = bounds.southwest;
-                    
+
                     if (targ.latitude > ne.latitude) { target.y = 1; }
                     if (targ.latitude < sw.latitude) { target.y = -1; }
                     if (targ.longitude > ne.longitude) { target.x = 1; }
@@ -441,12 +441,12 @@ public class MapActivity extends Activity {
             Point targetPoint   = projection.toScreenLocation(mMap.targetPosition);
             Point positionPoint = projection.toScreenLocation(position.target);
             LatLng current      = position.target;
-            
+
             if (mode == config.FACE_INPUT && !faceMode.noFace) {
                 positionPoint = faceMode.face.getCenter();
                 current = projection.fromScreenLocation(positionPoint);
             }
-            
+
             long elapsed = System.currentTimeMillis() - initTime;
             double dLat  = mMap.targetPosition.latitude  - current.latitude;
             double dLong = mMap.targetPosition.longitude - current.longitude;
@@ -634,11 +634,11 @@ public class MapActivity extends Activity {
         Point getDelta() {
             return new Point(rightEyeX - leftEyeX, rightEyeY - leftEyeY);
         }
-        
+
         float getDifference() {
             int x = rightEyeX - leftEyeX;
             int y = rightEyeY - leftEyeY;
-            
+
             return (float) Math.sqrt(x * x + y * y);
         }
 

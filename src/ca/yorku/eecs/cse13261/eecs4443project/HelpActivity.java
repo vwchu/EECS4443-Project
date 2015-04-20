@@ -18,9 +18,9 @@ public class HelpActivity extends Activity {
     public void onBackPressed() {
         clickExit(null);
     }
-    
+
     /// On Click Callbacks
-    
+
     public void clickExit(View view) {
         goToActivity(this, StartActivity.class, null);
     }

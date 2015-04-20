@@ -47,24 +47,27 @@
     <string name="results_text_1">
         You have completed the user study.
         Tap the Email button below to send the data file created.
-        If fails or not possible, email the file at:	</string>
+        If fails or not possible, email the file at:
+    </string>
     <string name="results_text_2">to:</string>
     <string name="results_text_3">
         Do not delete any created data files until after
-        you have received confirmation from the author.	</string>
+        you have received confirmation from the author.
+    </string>
     <string name="results_text_4">
         Please also complete the survey regarding your user feedback
-        for this experiment at the following URL:	</string>
+        for this experiment at the following URL:
+    </string>
 
     <!-- Help -->
     <string name="help_title">Help</string>
-	<string name="help_btn_exit">Exit</string>
+    <string name="help_btn_exit">Exit</string>
     <string name="help_text_1">
         This application is intended for a user study to
         examine the differences between touch-based input and
-        facial-tracking. 
+        facial-tracking.
     </string>
-    <string name="help_text_2">    
+    <string name="help_text_2">
         The test will occur in a quiet room with favourable lighting
         conditions where the participants will be seated at a table.
         The Experiment mode will run a certain number of trials (default
@@ -78,8 +81,8 @@
         begin. To goal is to center the pin, while zooming until
         the indicated zoom difference is 0.0 (in the status bar).
         A crosshair will be provided to help the user center the marker.
-        The crosshair should be centered at the bottom tip of the pin, 
-        not the center of the pin. The user may pan the map by swiping 
+        The crosshair should be centered at the bottom tip of the pin,
+        not the center of the pin. The user may pan the map by swiping
         left, right, up and down with one finger, and zoom in and out
         with two-finger pitch. Please do not use the double tap gesture
         to focus and zoom.
@@ -94,7 +97,7 @@
         each trial begins. Moving one\'s head toward and away from the screen
         will zoom in and out respectively. Moving one\'s head side-to-side or
         tilting one\'s head left and right will pan the map west and east
-        respectively. And Moving one\'s head up and down or tilting one\'s 
+        respectively. And Moving one\'s head up and down or tilting one\'s
         head up and down will pan the map north and south respectively. An
         indicator, will display the preceived location of the left and right
         eyes, the zoom difference as well as the direction to the target when
@@ -103,7 +106,7 @@
         screen.
     </string>
     <string name="help_text_5">
-    	A status bar at the bottom of the screen will indicate the
+        A status bar at the bottom of the screen will indicate the
         difference in latitude, longitude and zoom from the desired target
         as well as the time elapsed. You will hear an audio tone to start and
         when you finish. Each trial is run for a maximum of 5 minutes, at which
@@ -111,8 +114,8 @@
         to continue to the next trial.
     </string>
     <string name="help_text_6">
-    	For a demonstration, try the Demo Touch or Demo Facial Tracking modes.
-    	For further clarification, feel free to email: 
+        For a demonstration, try the Demo Touch or Demo Facial Tracking modes.
+        For further clarification, feel free to email:
     </string>
 
 </resources>

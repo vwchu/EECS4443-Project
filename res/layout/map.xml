@@ -6,117 +6,114 @@
     android:layout_height="fill_parent" >
 
     <FrameLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:paddingBottom="80dp" >
-       
-	    <FrameLayout
-	        android:id="@+id/cameraPreview"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_gravity="center"
-			android:visibility="invisible" />
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingBottom="80dp" >
 
-	    <fragment
-	        android:id="@+id/map"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:name="com.google.android.gms.maps.MapFragment"
-			android:layout_gravity="center" />
+        <FrameLayout
+            android:id="@+id/cameraPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
 
-	    <ca.yorku.eecs.cse13261.eecs4443project.DrawView
-	        android:id="@+id/fpOverlay"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:layout_gravity="center" />
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_gravity="center" />
 
-	    <ImageView
-	        android:id="@+id/crosshair"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center"
-	        android:contentDescription="@string/map_crosshair"
-	        android:src="@drawable/crosshair" />
-	    
-	    <TextView 
+        <ca.yorku.eecs.cse13261.eecs4443project.DrawView
+            android:id="@+id/fpOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/crosshair"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/map_crosshair"
+            android:src="@drawable/crosshair" />
+
+        <TextView
             android:id="@+id/mapCountDown"
             android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:textSize="200sp"
             android:textStyle="bold"
             android:textColor="#80ff0000"
             android:visibility="gone" />
 
-	</FrameLayout>
-    
+    </FrameLayout>
+
     <LinearLayout
         android:layout_width="fill_parent"
-	    android:layout_height="80dp"
-	    android:layout_gravity="bottom"
-	    android:orientation="horizontal"
-	    android:baselineAligned="false">
-    
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
         <Button
             style="?android:attr/button"
-	        android:id="@+id/mapStartBtn"
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:layout_marginTop="5dp"
-	        android:onClick="clickStart"
-	        android:text="@string/map_btn_start"
-	        android:textSize="30sp" />   
-
+            android:id="@+id/mapStartBtn"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="5dp"
+            android:onClick="clickStart"
+            android:text="@string/map_btn_start"
+            android:textSize="30sp" />
         <Button
             style="?android:attr/button"
             android:id="@+id/mapDoneBtn"
             android:visibility="gone"
-	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
-	        android:layout_marginTop="5dp"
-	        android:onClick="clickDone"
-	        android:text="@string/map_btn_done"
-	        android:textSize="30sp" />
-
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="5dp"
+            android:onClick="clickDone"
+            android:text="@string/map_btn_done"
+            android:textSize="30sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/mapStatus"
         android:visibility="gone"
         android:layout_width="fill_parent"
-	    android:layout_height="80dp"
-	    android:layout_gravity="bottom"
-	    android:orientation="horizontal"
-	    android:baselineAligned="false">
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
         <LinearLayout
-	        android:layout_width="0dp"
-	        android:layout_height="80dp"
-	        android:layout_weight=".2"
-	        android:orientation="vertical"
-	        android:padding="10dp" >        
-            <TextView 
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight=".2"
+            android:orientation="vertical"
+            android:padding="10dp" >
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_label_lat"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView 
+            <TextView
                 android:id="@+id/mapLat"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_default_value"
-                android:textAppearance="?android:attr/textAppearanceLarge" />            
+                android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
 
         <LinearLayout
-	        android:layout_width="0dp"
-	        android:layout_height="80dp"
-	        android:layout_weight=".2"
-	        android:orientation="vertical"
-	        android:padding="10dp" >        
-            <TextView 
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight=".2"
+            android:orientation="vertical"
+            android:padding="10dp" >
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
@@ -128,49 +125,49 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_default_value"
-                android:textAppearance="?android:attr/textAppearanceLarge" />            
+                android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
-        
+
         <LinearLayout
-	        android:layout_width="0dp"
-	        android:layout_height="80dp"
-	        android:layout_weight=".2"
-	        android:orientation="vertical"
-	        android:padding="10dp" >        
-            <TextView 
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_weight=".2"
+            android:orientation="vertical"
+            android:padding="10dp" >
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_label_zoom"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView 
+            <TextView
                 android:id="@+id/mapZoom"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_default_value"
-                android:textAppearance="?android:attr/textAppearanceLarge" />            
+                android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
-	        android:layout_height="80dp"
-	        android:layout_weight=".2"
-	        android:orientation="vertical"
-	        android:padding="10dp" >        
-            <TextView 
+            android:layout_height="80dp"
+            android:layout_weight=".2"
+            android:orientation="vertical"
+            android:padding="10dp" >
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_label_time"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-            <TextView 
+            <TextView
                 android:id="@+id/mapTime"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:text="@string/map_default_time"
-                android:textAppearance="?android:attr/textAppearanceLarge" />            
+                android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
 
     </LinearLayout>

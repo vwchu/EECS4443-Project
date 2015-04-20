@@ -22,7 +22,7 @@ public class DrawView extends View {
     private final Paint eyeDistBrush   = new Paint();
     private final Paint zoomBrush      = new Paint();
     private final int   color          = Color.RED;
-    
+
     public FaceData[] faces;
     public String zoom;
     public Point direction;
@@ -50,7 +50,7 @@ public class DrawView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
-        
+
         if (direction != null) {
             if (direction.x < 0) {
                 path.reset();
@@ -83,7 +83,7 @@ public class DrawView extends View {
                 canvas.drawPath(path, arrowBrush);
             }
         }
-        
+
         if (faces != null) {
             for (FaceData face : faces) {
                 if (face.leftEye != null) {

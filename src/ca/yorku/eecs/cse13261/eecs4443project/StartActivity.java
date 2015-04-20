@@ -79,7 +79,7 @@ public class StartActivity extends Activity {
                                 }
                                 Toast.makeText(StartActivity.this,
                                     success ? config.dataDirectory + " has been deleted."
-                                            : config.dataDirectory + " could not be deleted.", 
+                                            : config.dataDirectory + " could not be deleted.",
                                     Toast.LENGTH_LONG).show();
                             }})
                         .setNegativeButton(R.string.start_clean_cancel, new DialogInterface.OnClickListener() {
@@ -98,7 +98,7 @@ public class StartActivity extends Activity {
     public void clickHelp(View view) {
         goToActivity(this, HelpActivity.class, null);
     }
-    
+
     /**
      * Called when the "Exit" button is pressed.
      * Stops the application.

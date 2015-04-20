@@ -10,7 +10,7 @@ public class Utils {
      * From the given Activity, start a new
      * activity of the given class and pass the
      * given Bundle. Finish the given Activity.
-     * 
+     *
      * @param from
      *      this current activity
      * @param toActivity

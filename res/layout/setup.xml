@@ -4,197 +4,197 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-	<ScrollView
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:gravity="center_horizontal"
-	    android:orientation="horizontal"
-	    android:paddingBottom="50dp" >
-	
-	    <LinearLayout
-	        android:id="@+id/param_layout"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal"
-	        android:gravity="center_horizontal"
-	        android:layout_margin="30dp"
-	        android:paddingBottom="50dp"
-	        android:orientation="vertical" >
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingBottom="50dp" >
 
-			<TableLayout
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:paddingLeft="0dp"
-	            android:paddingRight="0dp" >
-	
-			    <TableRow android:gravity="fill_horizontal">
-				    <TextView
-						android:gravity="fill_horizontal"
-					   	android:paddingTop="20dp"
-					   	android:paddingBottom="20dp"
-					   	android:text="@string/setup_experiment_title"
-					   	android:textAppearance="?android:attr/textAppearanceLarge"
-					   	android:textSize="30sp" />
-				</TableRow>
-			    
-			    <TableRow android:gravity="center_vertical">
-	                <TextView 
-	                    android:gravity="end"
-			            android:paddingLeft="5dp"
-			            android:paddingRight="5dp"
-			            android:text="@string/setup_user_initials"
-			            android:textAppearance="?android:attr/textAppearanceMedium"
-			            android:labelFor="@+id/setupUserInitials" />
-	                <EditText
-	                    android:id="@id/setupUserInitials"
-	                    android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:singleLine="true"
-	                    android:padding="10dp"
-	                    android:inputType="text" >	                    
-	                </EditText>
-	            </TableRow>
-			    
-	            <TableRow android:gravity="center_vertical">
-	                <TextView 
-	                    android:gravity="end"
-			            android:paddingLeft="5dp"
-			            android:paddingRight="5dp"
-			            android:text="@string/setup_part"
-			            android:textAppearance="?android:attr/textAppearanceMedium" />
-	                <Spinner
-	                    android:id="@+id/setupParticipant"
-	                    android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:singleLine="true" />
-	            </TableRow>
-	
-	            <TableRow android:gravity="center_vertical">
-	                <TextView
-	                    android:gravity="end"
-	                    android:paddingLeft="5dp"
-	                    android:paddingRight="5dp"
-	                    android:text="@string/setup_group"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	                <Spinner
-	                    android:id="@+id/setupGroup"
-	                    android:layout_weight="1"
-						android:gravity="start"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	            </TableRow>
-	
-	            <TableRow android:gravity="center_vertical">
-	                <TextView
-	                    android:gravity="end"
-	                    android:paddingLeft="5dp"
-	                    android:paddingRight="5dp"
-	                    android:text="@string/setup_trials"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	                <Spinner 
-	                    android:id="@+id/setupTrials"
-	                    android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	            </TableRow>
-	            
-	            <TableRow android:gravity="fill_horizontal">
-		            <TextView
-		                android:gravity="fill_horizontal"
-	                    android:paddingTop="20dp"
-	                    android:paddingBottom="20dp"
-	                    android:text="@string/setup_orders_title"
-	                    android:textAppearance="?android:attr/textAppearanceLarge"
-	                    android:textSize="30sp" />
-	            </TableRow>
+        <LinearLayout
+            android:id="@+id/param_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_margin="30dp"
+            android:paddingBottom="50dp"
+            android:orientation="vertical" >
 
-	            <TableRow android:gravity="fill_horizontal">
-		            <TextView
-		                android:id="@+id/setupOrdering"
-	                    android:gravity="fill_horizontal"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	            </TableRow>
+            <TableLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp" >
 
-				<TableRow android:gravity="fill_horizontal">
-		            <TextView
-		                android:gravity="fill_horizontal"
-	                    android:paddingTop="20dp"
-	                    android:paddingBottom="20dp"
-	                    android:text="@string/setup_logging_title"
-	                    android:textAppearance="?android:attr/textAppearanceLarge"
-	                    android:textSize="30sp" />
-	            </TableRow>
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:gravity="fill_horizontal"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:text="@string/setup_experiment_title"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textSize="30sp" />
+                </TableRow>
 
-	            <TableRow android:gravity="fill_horizontal">
-		            <TextView
-		                android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:text="@string/setup_logging_data_directory"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-					<TextView
-		                android:id="@+id/setupDataDirectory"
-	                    android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	            </TableRow>
+                <TableRow android:gravity="center_vertical">
+                    <TextView
+                        android:gravity="end"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:text="@string/setup_user_initials"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:labelFor="@+id/setupUserInitials" />
+                    <EditText
+                        android:id="@id/setupUserInitials"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:singleLine="true"
+                        android:padding="10dp"
+                        android:inputType="text" >
+                    </EditText>
+                </TableRow>
 
-	            <TableRow android:gravity="fill_horizontal">
-		            <TextView
-		                android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:text="@string/setup_logging_data_file"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-		            <TextView
-		                android:id="@+id/setupDataFile"
-	                    android:layout_weight="1"
-	                    android:gravity="start"
-	                    android:textAppearance="?android:attr/textAppearanceMedium" />
-	            </TableRow>
-	            
-	        </TableLayout>
+                <TableRow android:gravity="center_vertical">
+                    <TextView
+                        android:gravity="end"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:text="@string/setup_part"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <Spinner
+                        android:id="@+id/setupParticipant"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:singleLine="true" />
+                </TableRow>
 
-	    </LinearLayout>
-	    
-	</ScrollView>
+                <TableRow android:gravity="center_vertical">
+                    <TextView
+                        android:gravity="end"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:text="@string/setup_group"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <Spinner
+                        android:id="@+id/setupGroup"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </TableRow>
 
-	<LinearLayout
+                <TableRow android:gravity="center_vertical">
+                    <TextView
+                        android:gravity="end"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:text="@string/setup_trials"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <Spinner
+                        android:id="@+id/setupTrials"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </TableRow>
+
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:gravity="fill_horizontal"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:text="@string/setup_orders_title"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textSize="30sp" />
+                </TableRow>
+
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:id="@+id/setupOrdering"
+                        android:gravity="fill_horizontal"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </TableRow>
+
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:gravity="fill_horizontal"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:text="@string/setup_logging_title"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textSize="30sp" />
+                </TableRow>
+
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:text="@string/setup_logging_data_directory"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/setupDataDirectory"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </TableRow>
+
+                <TableRow android:gravity="fill_horizontal">
+                    <TextView
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:text="@string/setup_logging_data_file"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/setupDataFile"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                </TableRow>
+
+            </TableLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="horizontal" >
-			
-		<Button
-		    style="?android:attr/buttonStyle"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight=".3"
-		    android:onClick="clickOK"
-		    android:text="@string/setup_btn_ok"
-		    android:textAppearance="?android:attr/textAppearanceMedium" >
 
-		</Button>
+        <Button
+            style="?android:attr/buttonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".3"
+            android:onClick="clickOK"
+            android:text="@string/setup_btn_ok"
+            android:textAppearance="?android:attr/textAppearanceMedium" >
 
-		<Button
-		    style="?android:attr/buttonStyle"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight=".3"
-		    android:onClick="clickReset"
-		    android:text="@string/setup_btn_reset"
-		    android:textAppearance="?android:attr/textAppearanceMedium" >
+        </Button>
 
-		</Button>
+        <Button
+            style="?android:attr/buttonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".3"
+            android:onClick="clickReset"
+            android:text="@string/setup_btn_reset"
+            android:textAppearance="?android:attr/textAppearanceMedium" >
 
-		<Button
-		    style="?android:attr/buttonStyle"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight=".3"
-		    android:onClick="clickExit"
-		    android:text="@string/setup_btn_exit"
-		    android:textAppearance="?android:attr/textAppearanceMedium" >
+        </Button>
 
-		</Button>
+        <Button
+            style="?android:attr/buttonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".3"
+            android:onClick="clickExit"
+            android:text="@string/setup_btn_exit"
+            android:textAppearance="?android:attr/textAppearanceMedium" >
 
-	</LinearLayout>
+        </Button>
+
+    </LinearLayout>
 
 </FrameLayout>

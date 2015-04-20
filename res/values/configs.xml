@@ -19,8 +19,8 @@
 
     <string name="app_name">EECS 4443 Project</string>
     <string name="author_email">vwchu@my.yorku.ca</string>
-    <string name="survey_url">http://1drv.ms/1yF32xZ</string>    
-    
+    <string name="survey_url">http://1drv.ms/1yF32xZ</string>
+
     <item type="integer" name="constTouchModeID">0</item>
     <item type="integer" name="constFaceModeID">1</item>
 
@@ -65,7 +65,7 @@
         <item>FACE</item>
     </string-array>
 
-	<string-array name="configModeNames">
+    <string-array name="configModeNames">
         <item>Touch-based</item>
         <item>Facial tracking</item>
     </string-array>

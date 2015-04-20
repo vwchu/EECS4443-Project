@@ -25,10 +25,10 @@
 
         <!--
           - ** You need to replace the key below with your own key. **
-	      - The example key below will not be accepted because it is not linked to the
-	      - certificate which you will use to sign this application.
-	      - See: https://developers.google.com/maps/documentation/android/start
-	      - for instructions on how to get your own key.
+          - The example key below will not be accepted because it is not linked to the
+          - certificate which you will use to sign this application.
+          - See: https://developers.google.com/maps/documentation/android/start
+          - for instructions on how to get your own key.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

@@ -13,12 +13,12 @@ public class ResultsActivity extends Activity {
 
     AppConfig config;
     Bundle bundle;
-    
+
     String userInitials;
     String participantCode;
     String dataDirectory;
     String dataFile;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +26,7 @@ public class ResultsActivity extends Activity {
         setTitle(R.string.results_title);
         config = getConfig(getResources());
         bundle = getIntent().getExtras();
-        
+
         loadBundle();
         ((TextView)findViewById(R.id.resultsFile)).setText(config.dataDirectory + "/" + dataFile);
         //((TextView)findViewById(R.id.resultsEmail)).setText("mailto:" + config.EMAIL);
@@ -36,9 +36,9 @@ public class ResultsActivity extends Activity {
     public void onBackPressed() {
         clickExit(null);
     }
-    
+
     /// On Click Callbacks
-    
+
     public void clickExit(View view) {
         goToActivity(this, StartActivity.class, null);
     }
@@ -56,12 +56,12 @@ public class ResultsActivity extends Activity {
     }
 
     /// Helper
-    
+
     void loadBundle() {
         userInitials    = bundle.getString  (config.INITIALS_KEY);
         participantCode = bundle.getString  (config.PARTICIPANT_KEY);
         dataDirectory   = bundle.getString  (config.DATADIR_KEY);
         dataFile        = bundle.getString  (config.DATAFILE_KEY);
     }
-    
+
 } // ResultsActivity

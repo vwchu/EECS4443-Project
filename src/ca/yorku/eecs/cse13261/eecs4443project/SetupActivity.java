@@ -37,14 +37,14 @@ public class SetupActivity extends Activity {
         ui = new SetupActivityUI();
         bundle = new Bundle();
     }
-    
+
     @Override
     public void onBackPressed() {
         clickExit(null);
     }
 
     /// CLICK CALLBACKS
-    
+
     public void clickOK(View view) {
         updateBundle();
         saveSettings();
@@ -105,7 +105,7 @@ public class SetupActivity extends Activity {
         }
         return modeOrder;
     }
-    
+
     void checkDataDirectory() {
         File directory = new File(Environment.getExternalStorageDirectory() + config.dataDirectory);
         if (!directory.exists() && !directory.mkdirs()) {
@@ -122,7 +122,7 @@ public class SetupActivity extends Activity {
             throwError(e);
         }
     }
-    
+
     String getDataFileName() {
         File directory = new File(Environment.getExternalStorageDirectory() + config.dataDirectory);
         for (int i = 1; ; i += 1) {
@@ -136,19 +136,19 @@ public class SetupActivity extends Activity {
             }
         }
     }
- 
+
     /// INNER CLASSES
-    
+
     class SetupActivityUI implements OnItemSelectedListener {
-        
+
         EditText setupUserInitials;
         Spinner  setupParticipants;
         Spinner  setupGroups;
         Spinner  setupTrials;
         TextView setupOrdering;
         TextView setupDataDirectory;
-        TextView setupDataFile;        
-        
+        TextView setupDataFile;
+
         SetupActivityUI() {
             setupUserInitials  = (EditText) findViewById(R.id.setupUserInitials);
             setupParticipants  = (Spinner)  findViewById(R.id.setupParticipant);
@@ -161,10 +161,10 @@ public class SetupActivity extends Activity {
             configSpinner(setupParticipants, config.participants, config.participantFormat);
             configSpinner(setupGroups, config.groups, config.groupFormat);
             configSpinner(setupTrials, config.trials, config.trialFormat);
-            
+
             setupParticipants.setOnItemSelectedListener(this);
             setupGroups.setOnItemSelectedListener(this);
-            
+
             checkDataDirectory();
             setupDataDirectory.setText(config.dataDirectory);
 
@@ -177,7 +177,7 @@ public class SetupActivity extends Activity {
             String defaultParticipant  = config.defaultParticipant;
             String defaultGroup        = config.defaultGroup;
             String defaultTrial        = config.defaultTrial;
-            
+
             if (!reset) {
                 defaultUserInitials = settings.getString(config.INITIALS_KEY   , defaultUserInitials);
                 defaultParticipant  = settings.getString(config.PARTICIPANT_KEY, defaultParticipant);
@@ -193,14 +193,14 @@ public class SetupActivity extends Activity {
 
         void configSpinner(Spinner spinner, int count, String format) {
             String[] values = new String[count];
-            for (int i = 0; i < count; i += 1) { 
+            for (int i = 0; i < count; i += 1) {
                 values[i] = String.format(format, i + 1);
             }
             spinner.setAdapter(new ArrayAdapter<CharSequence>(SetupActivity.this, R.layout.spinnerstyle, values));
         }
 
         void setSpinner(Spinner spinner, String value) {
-            for (int i = 0; i < spinner.getCount(); i += 1) { 
+            for (int i = 0; i < spinner.getCount(); i += 1) {
                 if (spinner.getAdapter().getItem(i).equals(value)) {
                     spinner.setSelection(i);
                 }
@@ -239,5 +239,5 @@ public class SetupActivity extends Activity {
         }
 
     } // SetupActivityUI
-    
+
 } // SetupActivity

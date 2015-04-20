@@ -6,112 +6,105 @@
     tools:context="ca.yorku.eecs.cse13261.eecs4443project.ResultsActivity" >
 
     <ScrollView
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:gravity="center_horizontal"
-	    android:orientation="horizontal"
-	    android:paddingBottom="50dp" >
-    
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="top"
-	        android:padding="20dp"
-	        android:orientation="vertical" >
-	        
-	        <TextView
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:text="@string/results_thanks"
-	            android:gravity="center_horizontal"
-	            android:textSize="30sp"
-	            android:paddingTop="20dp"
-	            android:paddingBottom="20dp" />
-	        <TextView
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:text="@string/results_text_1" />
-	        <TextView
-	            android:id="@+id/resultsFile"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:textStyle="bold"
-	            android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:paddingTop="10dp"
-	            android:paddingBottom="10dp" />
-	        <TextView
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:text="@string/results_text_2" />
-	        <TextView
-	            android:id="@+id/resultsEmail"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:textStyle="bold"
-	            android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:text="@string/author_email"
-	            android:autoLink="email"
-	            android:paddingTop="10dp"
-	            android:paddingBottom="10dp" />
-	        <TextView
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:text="@string/results_text_3" />
-	        <TextView
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:paddingTop="20dp"
-	            android:text="@string/results_text_4" />
-	        <TextView
-	            android:id="@+id/surveyURL"
-	            android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
-	            android:gravity="center_horizontal"
-	            android:textStyle="bold"
-	            android:textAppearance="?android:attr/textAppearanceMedium"
-	            android:autoLink="web"
-	            android:text="@string/survey_url"
-	            android:paddingTop="10dp"
-	            android:paddingBottom="10dp" />
-	        
-	    </LinearLayout>
-    
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingBottom="50dp" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:padding="20dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/results_thanks"
+                android:gravity="center_horizontal"
+                android:textSize="30sp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/results_text_1" />
+            <TextView
+                android:id="@+id/resultsFile"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/results_text_2" />
+            <TextView
+                android:id="@+id/resultsEmail"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/author_email"
+                android:autoLink="email"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/results_text_3" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:paddingTop="20dp"
+                android:text="@string/results_text_4" />
+            <TextView
+                android:id="@+id/surveyURL"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:autoLink="web"
+                android:text="@string/survey_url"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp" />
+
+        </LinearLayout>
+
     </ScrollView>
-    
-	<LinearLayout
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="horizontal" >
+        <Button
+            style="?android:attr/buttonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:onClick="clickEmail"
+            android:text="@string/results_btn_email"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <Button
+            style="?android:attr/buttonStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:onClick="clickExit"
+            android:text="@string/results_btn_exit"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 
-		<Button
-		    style="?android:attr/buttonStyle"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight=".5"
-		    android:onClick="clickEmail"
-		    android:text="@string/results_btn_email"
-		    android:textAppearance="?android:attr/textAppearanceMedium" >
-
-		</Button>
-		
-		<Button
-		    style="?android:attr/buttonStyle"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:layout_weight=".5"
-		    android:onClick="clickExit"
-		    android:text="@string/results_btn_exit"
-		    android:textAppearance="?android:attr/textAppearanceMedium" >
-
-		</Button>
-		
-	</LinearLayout>
-    
 </FrameLayout>
