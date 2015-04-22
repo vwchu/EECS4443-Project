@@ -92,14 +92,6 @@ public class StartActivity extends Activity {
     }
 
     /**
-     * Called when the "Instructions" or "Help" button
-     * is pressed. Shows the help page.
-     */
-    public void clickHelp(View view) {
-        goToActivity(this, HelpActivity.class, null);
-    }
-
-    /**
      * Called when the "Exit" button is pressed.
      * Stops the application.
      */

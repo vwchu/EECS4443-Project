@@ -145,7 +145,7 @@ public class MapActivity extends Activity {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
             if ((runID + 1) == (trials * order.length)) {
-                goToActivity(this, ResultsActivity.class, bundle);
+                goToActivity(this, StartActivity.class, bundle);
             } else {
                 bundle.putInt(config.RUN_KEY , runID + 1);
                 bundle.putInt(config.MODE_KEY, order[(runID + 1) / trials]);
