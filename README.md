@@ -6,6 +6,8 @@
 * [Project Description](docs/requirements.md)
 * [York University](http://www.eecs.yorku.ca)
 
+![Screenshots](docs/screenshots.png)
+
 Implemented an Android application for performing a user study comparing the
 accuracy and speed of facial-tracking and touch-based input methods. The
 software was developed in Java using the Google Android SDK, Google Maps API and
