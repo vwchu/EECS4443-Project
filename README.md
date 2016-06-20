@@ -25,6 +25,17 @@ intended controls
 * [Proposal](docs/proposal.pdf)
 * [Final Report](docs/report.pdf)
 
+## Getting Started
+
+1.  Import the project into Eclipse
+2.  Copy `res/values/configs.sample.xml` to `res/values/configs.yml`
+3.  Edit `res/values/configs.yml` by replacing the API key with your own key.
+    See: https://developers.google.com/maps/documentation/android/start
+    for instructions on how to get your own key.
+4.  Connect an Android device with 4.4.2 or later to your computer.
+5.  Enable sideloading of applications on the device from the Developer panel in the Settings.
+6.  Deploy the application APK to the device.
+
 ## Software Requirements
 
 * [Eclipse ADT](https://marketplace.eclipse.org/content/android-development-tools-eclipse)
@@ -39,14 +50,3 @@ intended controls
   * Qualcomm Snapdragon processor
   * Front-facing camera
   * Accelerometer
-
-## Getting Started
-
-1.  Import the project into Eclipse
-2.  Copy `res/values/configs.sample.xml` to `res/values/configs.yml`
-3.  Edit `res/values/configs.yml` by replacing the API key with your own key.
-    See: https://developers.google.com/maps/documentation/android/start
-    for instructions on how to get your own key.
-4.  Connect an Android device with 4.4.2 or later to your computer.
-5.  Enable sideloading of applications on the device from the Developer panel in the Settings.
-6.  Deploy the application APK to the device.
