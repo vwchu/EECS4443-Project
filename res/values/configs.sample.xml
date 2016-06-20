@@ -18,8 +18,16 @@
 <resources>
 
     <string name="app_name">EECS 4443 Project</string>
-    <string name="author_email">vwchu@my.yorku.ca</string>
-    <string name="survey_url">http://1drv.ms/1yF32xZ</string>
+    <string name="author_email">mail@example.com</string>
+
+    <!--
+      - ** You need to replace the key below with your own key. **
+      - The example key below will not be accepted because it is not linked to the
+      - certificate which you will use to sign this application.
+      - See: https://developers.google.com/maps/documentation/android/start
+      - for instructions on how to get your own key.
+    -->
+    <string name="api_key">API_KEY</string>
 
     <item type="integer" name="constTouchModeID">0</item>
     <item type="integer" name="constFaceModeID">1</item>

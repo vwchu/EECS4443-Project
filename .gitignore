@@ -5,3 +5,4 @@ node_modules
 bin/
 gen/
 .settings/
+res/values/configs.xml
