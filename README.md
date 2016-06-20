@@ -27,18 +27,19 @@ intended controls
 
 ## Getting Started
 
-1.  Import the project into Eclipse
-2.  Copy `res/values/configs.sample.xml` to `res/values/configs.yml`
-3.  Edit `res/values/configs.yml` by replacing the API key with your own key.
+1.  Import the project into Android Studio
+2.  Copy `app/src/main/res/values/configs.sample.xml` to `app/src/main/res/values/configs.xml`
+3.  Edit `app/src/main/res/values/configs.xml` by replacing the API key with your own key.
     See: https://developers.google.com/maps/documentation/android/start
     for instructions on how to get your own key.
-4.  Connect an Android device with 4.4.2 or later to your computer.
-5.  Enable sideloading of applications on the device from the Developer panel in the Settings.
-6.  Deploy the application APK to the device.
+4.  Sync Gradle build files.
+5.  Connect an Android device with 4.4.2 or later to your computer.
+6.  Enable sideloading of applications on the device from the Developer panel in the Settings.
+7.  Deploy the application APK to the device.
 
 ## Software Requirements
 
-* [Eclipse ADT](https://marketplace.eclipse.org/content/android-development-tools-eclipse)
+* [Android Studio](https://developer.android.com/studio/index.html)
 * [Google Maps API](https://developers.google.com/maps/documentation/android/start)
 * [Google Play Services](https://developers.google.com/android/guides/setup)
 * [Qualcomm Snapdragon Facial Recognition API](https://developer.qualcomm.com/software/snapdragon-sdk-android/facial-recognition)
